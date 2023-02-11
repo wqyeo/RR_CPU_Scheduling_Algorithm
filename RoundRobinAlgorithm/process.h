@@ -5,8 +5,8 @@
 
 typedef struct {
   char name[MAX_NAME_LEN];
-  float arrival_time;
-  float burst_time;
+  float arrivalTime;
+  float burstTime;
 } Process;
 
 #endif

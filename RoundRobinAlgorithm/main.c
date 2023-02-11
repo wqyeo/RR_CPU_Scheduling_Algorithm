@@ -5,10 +5,10 @@
 #include "round_robin.h"
 
 int request_processes_count(){
-    int processes_count = 0;
+    int processesCount = 0;
     printf("\n\tInput the number of processes: ");
-    scanf("%d", &processes_count);
-    return processes_count;
+    scanf("%d", &processesCount);
+    return processesCount;
 }
 
 Process *request_processes(int size) {
@@ -19,20 +19,27 @@ Process *request_processes(int size) {
     printf("\nEnter name for process %d (max %d characters): ", i, MAX_NAME_LEN-1);
     scanf("%s", processes[i].name);
     printf("Enter burst time for process %s: ", processes[i].name);
-    scanf("%f", &processes[i].burst_time);
+    scanf("%f", &processes[i].burstTime);
     printf("Enter arrival time for process %s: ", processes[i].name);
-    scanf("%f", &processes[i].arrival_time);
+    scanf("%f", &processes[i].arrivalTime);
   }
 
   return processes;
 }
 
-int main() {
-    int processes_count = request_processes_count();
-    Process *processes = request_processes(numProcesses);
+void perform_round_robin(){
+    int processesCount = request_processes_count();
+    Process *processes = request_processes(processesCount);
 
-    round_robin(processes, processes_count);
+    float timeQuantum;
+    printf("\n\tInput time quantum: ");
+    scanf("%f", &timeQuantum);
 
+    round_robin(processes, processesCount, timeQuantum);
     free(processes);
+}
+
+int main() {
+    perform_round_robin();
     return 0;
 }
