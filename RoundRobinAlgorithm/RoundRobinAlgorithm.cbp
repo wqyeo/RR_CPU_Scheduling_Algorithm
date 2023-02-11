@@ -34,6 +34,11 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="process.h" />
+		<Unit filename="round_robin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="round_robin.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

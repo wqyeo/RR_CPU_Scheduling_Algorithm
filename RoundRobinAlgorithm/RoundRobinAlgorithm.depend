@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1676142838 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\main.c
+	<stdio.h>
+	<stdlib.h>
+	"process.h"
+	"round_robin.h"
+
+1676140757 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\process.h
+
+1676141602 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin.h
+
+1676142978 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\roundrobin.c
+	<stdio.h>
+	"process.h"
+
+1676143877 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin.c
+	<stdio.h>
+	"process.h"
+
