@@ -10,6 +10,8 @@ void round_robin(Process *processes, int processesSize, float timeQuantum) {
     float turnaroundTime[processesSize];
     float responseTime[processesSize];
 
+    int contextSwitch = 0;
+
     for (i = 0; i < processesSize; i++) {
         remainingTime[i] = (int) processes[i].burstTime;
         waitingTime[i] = 0;
@@ -40,6 +42,7 @@ void round_robin(Process *processes, int processesSize, float timeQuantum) {
                     turnaroundTime[i] = currentTime - processes[i].arrivalTime;
                     remainingTime[i] = 0;
                 }
+                ++contextSwitch;
             }
         }
         if (allProcessesDoneFlag == 1) {
@@ -67,4 +70,5 @@ void round_robin(Process *processes, int processesSize, float timeQuantum) {
     printf("\nAverage Waiting Time: %.2f\n", avgWaitingTime);
     printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
     printf("Average Response Time: %.2f\n", avgResponseTime);
+    printf("Context Switch: %d\n", contextSwitch);
 }

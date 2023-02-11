@@ -3,6 +3,7 @@
 
 #include "process.h"
 #include "round_robin.h"
+#include "manhatten_round_robin.h"
 
 int request_processes_count(){
     int processesCount = 0;
@@ -27,19 +28,20 @@ Process *request_processes(int size) {
   return processes;
 }
 
-void perform_round_robin(){
-    int processesCount = request_processes_count();
-    Process *processes = request_processes(processesCount);
-
+void perform_round_robin(Process *processes, int processesCount){
     float timeQuantum;
     printf("\n\tInput time quantum: ");
     scanf("%f", &timeQuantum);
 
     round_robin(processes, processesCount, timeQuantum);
-    free(processes);
 }
 
 int main() {
-    perform_round_robin();
+    int processesCount = request_processes_count();
+    Process *processes = request_processes(processesCount);
+
+    manhattan_round_robin(processes, processesCount);
+
+    free(processes);
     return 0;
 }
