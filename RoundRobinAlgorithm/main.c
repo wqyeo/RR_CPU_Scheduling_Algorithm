@@ -2,8 +2,29 @@
 #include <stdlib.h>
 
 #include "process.h"
+#include "round_robin_result.h"
+
 #include "round_robin.h"
 #include "manhatten_round_robin.h"
+
+void print_round_robin_result(RoundRobinResult result){
+    int i;
+    printf("\nCPU Scheduling Algorithm (%s)\n", result.roundRobinUsed);
+    printf("\nTime Quantum: %.2f", result.timeQuantum);
+
+    // Print out a table of the times for each of the process.
+    printf("\nPROCESS\tBURST TIME\tWAITING TIME\tTURNAROUND TIME\tRESPONSE TIME\n");
+    for (i = 0; i < result.processesSize; i++) {
+        printf("%s\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\n",
+               result.processResults[i].process.name, result.processResults[i].process.burstTime, result.processResults[i].waitingTime, result.processResults[i].turnaroundTime, result.processResults[i].responseTime);
+    }
+
+    printf("\nAverage Waiting Time: %.2f\n", result.avgWaitingTime);
+    printf("Average Turnaround Time: %.2f\n", result.avgTurnaroundTime);
+    printf("Average Response Time: %.2f\n", result.avgResponseTime);
+    printf("Context Switch: %d\n", result.contextSwitch);
+    printf("Total Time Taken: %.2f\n", result.totalTime);
+}
 
 int request_processes_count(){
     int processesCount = 0;
@@ -40,8 +61,10 @@ int main() {
     int processesCount = request_processes_count();
     Process *processes = request_processes(processesCount);
 
-    manhattan_round_robin(processes, processesCount);
+    RoundRobinResult result = manhattan_round_robin(processes, processesCount);
+    print_round_robin_result(result);
 
     free(processes);
+    free(result.processResults);
     return 0;
 }

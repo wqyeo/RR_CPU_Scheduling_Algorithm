@@ -5,12 +5,17 @@
 #include "process_result.h"
 
 typedef struct {
+  char roundRobinUsed[256];
+
   ProcessResult *processResults;
-  int resultSize;
+  int processesSize;
 
   float avgWaitingTime;
   float avgTurnaroundTime;
   float avgResponseTime;
+
+  float timeQuantum;
+  float totalTime;
   int contextSwitch;
 } RoundRobinResult;
 

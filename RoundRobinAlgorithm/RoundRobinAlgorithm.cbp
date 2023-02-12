@@ -34,11 +34,17 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="manhattan_round_robin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="manhatten_round_robin.h" />
 		<Unit filename="process.h" />
+		<Unit filename="process_result.h" />
 		<Unit filename="round_robin.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="round_robin.h" />
+		<Unit filename="round_robin_result.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

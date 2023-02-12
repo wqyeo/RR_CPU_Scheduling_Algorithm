@@ -1,22 +1,29 @@
 // CPU Scheduling Method : Round Robin
 #include <stdio.h>
+
 #include "process.h"
+#include "process_result.h"
+#include "round_robin_result.h"
 
-void round_robin(Process *processes, int processesSize, float timeQuantum) {
+RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum) {
     int i, j;
-    float currentTime = 0;
     float remainingTime[processesSize];
-    float waitingTime[processesSize];
-    float turnaroundTime[processesSize];
-    float responseTime[processesSize];
 
-    int contextSwitch = 0;
+    RoundRobinResult result;
+    result.processResults = (ProcessResult*) malloc(processesSize * sizeof(ProcessResult));
+    result.processesSize = processesSize;
 
+    result.totalTime = 0;
+    result.contextSwitch = 0;
+    result.timeQuantum = timeQuantum;
+
+    // init
     for (i = 0; i < processesSize; i++) {
-        remainingTime[i] = (int) processes[i].burstTime;
-        waitingTime[i] = 0;
-        turnaroundTime[i] = 0;
-        responseTime[i] = 0;
+        remainingTime[i] = processes[i].burstTime;
+        result.processResults[i].waitingTime = 0.0f;
+        result.processResults[i].turnaroundTime = 0.0f;
+        result.processResults[i].responseTime = 0.0f;
+        result.processResults[i].process = processes[i];
     }
 
     // This loop simulates the Round Robin on all of the processes.
@@ -24,7 +31,7 @@ void round_robin(Process *processes, int processesSize, float timeQuantum) {
         int allProcessesDoneFlag = 1;
         for (i = 0; i < processesSize; i++) {
             // Ensure the response time for this process is never negative.
-            responseTime[i] = ((i  * timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * timeQuantum) - processes[i].arrivalTime) : 0;
+            result.processResults[i].responseTime = ((i  * timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * timeQuantum) - processes[i].arrivalTime) : 0;
 
             // Unfinished process...
             if (remainingTime[i] > 0) {
@@ -32,17 +39,17 @@ void round_robin(Process *processes, int processesSize, float timeQuantum) {
                 if (remainingTime[i] > timeQuantum) {
                     // Process won't finish by this time quantum.
                     // Increment current time by the time quantum, then decrease the process's remaining time.
-                    currentTime += timeQuantum;
+                    result.totalTime += timeQuantum;
                     remainingTime[i] -= timeQuantum;
                 } else {
                     // Process will finish by this time quantum, increment current time by remaining time.
                     // Then, calculate the times for this process...
-                    currentTime += remainingTime[i];
-                    waitingTime[i] = currentTime - processes[i].arrivalTime - processes[i].burstTime;
-                    turnaroundTime[i] = currentTime - processes[i].arrivalTime;
+                    result.totalTime += remainingTime[i];
+                    result.processResults[i].waitingTime = result.totalTime  - processes[i].arrivalTime - processes[i].burstTime;
+                    result.processResults[i].turnaroundTime = result.totalTime  - processes[i].arrivalTime;
                     remainingTime[i] = 0;
                 }
-                ++contextSwitch;
+                result.contextSwitch += 1;
             }
         }
         if (allProcessesDoneFlag == 1) {
@@ -50,25 +57,18 @@ void round_robin(Process *processes, int processesSize, float timeQuantum) {
         }
     }
 
-    // Print out a table of the times for each of the process.
-    printf("\nPROCESS\tBURST TIME\tWAITING TIME\tTURNAROUND TIME\tRESPONSE TIME\n");
+    // Calculate average of times
+    result.avgResponseTime = 0.0f; result.avgTurnaroundTime = 0.0f; result.avgWaitingTime = 0.0f;
     for (i = 0; i < processesSize; i++) {
-        printf("%s\t%.2f\t\t%.2f\t\t%.2f\t\t%.2f\n", processes[i].name, processes[i].burstTime, waitingTime[i], turnaroundTime[i], responseTime[i]);
+        result.avgWaitingTime += result.processResults[i].waitingTime;
+        result.avgTurnaroundTime += result.processResults[i].turnaroundTime;
+        result.avgResponseTime += result.processResults[i].responseTime;
     }
+    result.avgWaitingTime /= processesSize;
+    result.avgTurnaroundTime /= processesSize;
+    result.avgResponseTime /= processesSize;
 
-    // Calculate average of times, then print out.
-    float avgWaitingTime = 0.0, avgTurnaroundTime = 0.0, avgResponseTime = 0.0;
-    for (i = 0; i < processesSize; i++) {
-        avgWaitingTime += waitingTime[i];
-        avgTurnaroundTime += turnaroundTime[i];
-        avgResponseTime += responseTime[i];
-    }
-    avgWaitingTime /= processesSize;
-    avgTurnaroundTime /= processesSize;
-    avgResponseTime /= processesSize;
+    strcpy(result.roundRobinUsed, "Round Robin");
 
-    printf("\nAverage Waiting Time: %.2f\n", avgWaitingTime);
-    printf("Average Turnaround Time: %.2f\n", avgTurnaroundTime);
-    printf("Average Response Time: %.2f\n", avgResponseTime);
-    printf("Context Switch: %d\n", contextSwitch);
+    return result;
 }

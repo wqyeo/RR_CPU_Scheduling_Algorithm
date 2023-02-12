@@ -3,11 +3,10 @@
 #include <stdio.h>
 
 #include "process.h"
+#include "round_robin_result.h"
 #include "round_robin.h"
 
-
-
-void manhattan_round_robin(Process *processes, int processesSize){
+RoundRobinResult manhattan_round_robin(Process *processes, int processesSize){
     float max = FLT_MIN;
     float min = FLT_MAX;
 
@@ -27,7 +26,8 @@ void manhattan_round_robin(Process *processes, int processesSize){
         quantumTime = processes[0].burstTime;
     }
 
-    printf("\nQuantum Time (Manhattan Distance): %.2f\n", quantumTime);
+    RoundRobinResult result = round_robin(processes, processesSize, quantumTime);
+    strcpy(result.roundRobinUsed, "Round Robin Manhattan Distance");
 
-    round_robin(processes, processesSize, quantumTime);
+    return result;
 }
