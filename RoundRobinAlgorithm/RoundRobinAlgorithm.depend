@@ -1,28 +1,35 @@
 # depslib dependency file v1.0
-1676154218 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\main.c
+1676228958 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\main.c
 	<stdio.h>
 	<stdlib.h>
 	"process.h"
+	"round_robin_result.h"
 	"round_robin.h"
 	"manhatten_round_robin.h"
+	"best_quantum_time_round_robin.h"
 
 1676153472 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\process.h
 
-1676153638 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin.h
+1676227331 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin.h
 
 1676142978 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\roundrobin.c
 	<stdio.h>
 	"process.h"
 
-1676154464 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin.c
+1676228927 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin.c
+	<stdio.h>
+	<limits.h>
+	"process.h"
+	"process_result.h"
+	"round_robin_result.h"
+
+1676210200 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\manhatten_round_robin.h
+
+1676210200 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\manhattan_round_robin.c
+	<float.h>
 	<stdio.h>
 	"process.h"
-
-1676154194 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\manhatten_round_robin.h
-
-1676154318 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\manhattan_round_robin.c
-	<float.h>
-	"process.h"
+	"round_robin_result.h"
 	"round_robin.h"
 
 1676179629 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/main.c
@@ -56,6 +63,24 @@
 	<float.h>
 	<stdio.h>
 	"process.h"
+	"round_robin_result.h"
+	"round_robin.h"
+
+1676210200 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\round_robin_result.h
+	"process.h"
+	"process_result.h"
+
+1676210200 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\process_result.h
+	"process.h"
+
+1676225926 c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\best_quantum_time_round_robin.h
+
+1676228919 source:c:\users\jerva\onedrive\documents\github\rr_cpu_scheduling_algorithm\roundrobinalgorithm\best_quantum_time_round_robin.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"process.h"
+	"process_result.h"
 	"round_robin_result.h"
 	"round_robin.h"
 

@@ -6,6 +6,7 @@
 
 #include "round_robin.h"
 #include "manhatten_round_robin.h"
+#include "best_quantum_time_round_robin.h"
 
 void print_round_robin_result(RoundRobinResult result){
     int i;
@@ -61,7 +62,7 @@ int main() {
     int processesCount = request_processes_count();
     Process *processes = request_processes(processesCount);
 
-    RoundRobinResult result = manhattan_round_robin(processes, processesCount);
+    RoundRobinResult result = modified_round_robin(processes, processesCount);
     print_round_robin_result(result);
 
     free(processes);

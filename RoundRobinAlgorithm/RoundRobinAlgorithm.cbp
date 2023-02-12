@@ -5,6 +5,7 @@
 		<Option title="RoundRobinAlgorithm" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
+		<Option virtualFolders="Models/" />
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/RoundRobinAlgorithm" prefix_auto="1" extension_auto="1" />
@@ -31,6 +32,10 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="best_quantum_time_round_robin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="best_quantum_time_round_robin.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -38,13 +43,19 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="manhatten_round_robin.h" />
-		<Unit filename="process.h" />
-		<Unit filename="process_result.h" />
+		<Unit filename="process.h">
+			<Option virtualFolder="Models/" />
+		</Unit>
+		<Unit filename="process_result.h">
+			<Option virtualFolder="Models/" />
+		</Unit>
 		<Unit filename="round_robin.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="round_robin.h" />
-		<Unit filename="round_robin_result.h" />
+		<Unit filename="round_robin_result.h">
+			<Option virtualFolder="Models/" />
+		</Unit>
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

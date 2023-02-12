@@ -1,19 +1,57 @@
 // CPU Scheduling Method : Round Robin
 #include <stdio.h>
+#include <limits.h>
 
 #include "process.h"
 #include "process_result.h"
 #include "round_robin_result.h"
 
+int compare_processes(const void *a, const void *b) {
+    Process *p1 = (Process *)a;
+    Process *p2 = (Process *)b;
+
+    return p1->burstTime - p2->burstTime;
+}
+
+float get_mean_burst_times(Process *processes, int processesSize) {
+    float sum = 0.0f;
+    for (int i = 0; i < processesSize; i++) {
+        sum += processes[i].burstTime;
+    }
+
+    return sum / processesSize;
+}
+
+float get_median_burst_times(Process *processes, int processesSize) {
+    qsort(processes, processesSize, sizeof(Process), compare_processes);
+
+    if (processesSize % 2 == 0) {
+        return (processes[processesSize / 2].burstTime + processes[(processesSize / 2) - 1].burstTime) / 2.0f;
+    } else {
+        return processes[processesSize / 2].burstTime;
+    }
+}
+
+int get_lowest_arrival_time(Process *processes, int processesSize) {
+    int lowestArrivalTime = INT_MAX;
+    for (int i = 0; i < processesSize; i++) {
+        if (processes[i].arrivalTime < lowestArrivalTime) {
+            lowestArrivalTime = processes[i].arrivalTime;
+        }
+    }
+    return lowestArrivalTime;
+}
+
 RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum) {
-    int i, j;
+    int i;
     float remainingTime[processesSize];
 
     RoundRobinResult result;
     result.processResults = (ProcessResult*) malloc(processesSize * sizeof(ProcessResult));
     result.processesSize = processesSize;
 
-    result.totalTime = 0;
+    // We start the lowest arrival time, simulate idling until a process arrives.
+    result.totalTime = get_lowest_arrival_time(processes, processesSize);
     result.contextSwitch = 0;
     result.timeQuantum = timeQuantum;
 
@@ -33,6 +71,12 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
             // Ensure the response time for this process is never negative.
             result.processResults[i].responseTime = ((i  * timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * timeQuantum) - processes[i].arrivalTime) : 0;
 
+            // Process has yet to arrive...
+            if (processes[i].arrivalTime > result.totalTime){
+                allProcessesDoneFlag = 0;
+                continue;
+            }
+
             // Unfinished process...
             if (remainingTime[i] > 0) {
                 allProcessesDoneFlag = 0;
@@ -46,7 +90,7 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
                     // Then, calculate the times for this process...
                     result.totalTime += remainingTime[i];
                     result.processResults[i].waitingTime = result.totalTime  - processes[i].arrivalTime - processes[i].burstTime;
-                    result.processResults[i].turnaroundTime = result.totalTime  - processes[i].arrivalTime;
+                    result.processResults[i].turnaroundTime = result.processResults[i].waitingTime + processes[i].burstTime;
                     remainingTime[i] = 0;
                 }
                 result.contextSwitch += 1;
