@@ -2,8 +2,8 @@
 #include <float.h>
 #include <stdio.h>
 
-#include "process.h"
-#include "round_robin_result.h"
+#include "../Models/process.h"
+#include "../Models/round_robin_result.h"
 #include "round_robin.h"
 
 RoundRobinResult manhattan_round_robin(Process *processes, int processesSize){

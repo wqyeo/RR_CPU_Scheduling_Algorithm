@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "process.h"
-#include "process_result.h"
-#include "round_robin_result.h"
+#include "../Models/process.h"
+#include "../Models/process_result.h"
+#include "../Models/round_robin_result.h"
 
 #include "round_robin.h"
 

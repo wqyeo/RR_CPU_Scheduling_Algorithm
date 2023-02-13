@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "process.h"
-#include "round_robin_result.h"
+#include "Models/process.h"
+#include "Models/round_robin_result.h"
 
-#include "round_robin.h"
-#include "manhatten_round_robin.h"
-#include "best_quantum_time_round_robin.h"
+#include "RoundRobin/round_robin.h"
+#include "RoundRobin/manhatten_round_robin.h"
+#include "RoundRobin/best_quantum_time_round_robin.h"
 
 void print_round_robin_result(RoundRobinResult result){
     int i;

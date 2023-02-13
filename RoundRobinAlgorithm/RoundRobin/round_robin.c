@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <limits.h>
 
-#include "process.h"
-#include "process_result.h"
-#include "round_robin_result.h"
+#include "../Models/process.h"
+#include "../Models/process_result.h"
+#include "../Models/round_robin_result.h"
 
 int compare_processes(const void *a, const void *b) {
     Process *p1 = (Process *)a;
