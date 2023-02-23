@@ -91,5 +91,7 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize) {
     result.avgWaitingTime /= processesSize;
     result.avgTurnaroundTime /= processesSize;
     result.avgResponseTime /= processesSize;
+
+    strcpy(result.roundRobinUsed, "Best Quantum Time Round Robin");
     return result;
 }

@@ -8,6 +8,8 @@
 #include "RoundRobin/manhatten_round_robin.h"
 #include "RoundRobin/best_quantum_time_round_robin.h"
 
+#include "util.h"
+
 void print_round_robin_result(RoundRobinResult result){
     int i;
     printf("\nCPU Scheduling Algorithm (%s)\n", result.roundRobinUsed);
@@ -64,6 +66,8 @@ int main() {
 
     RoundRobinResult result = modified_round_robin(processes, processesCount);
     print_round_robin_result(result);
+
+	save_result_to_file("SET", result);
 
     free(processes);
     free(result.processResults);

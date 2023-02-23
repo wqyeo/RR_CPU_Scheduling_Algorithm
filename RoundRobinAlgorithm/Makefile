@@ -8,13 +8,13 @@ RR_DIR=./RoundRobin
 MODELS_DIR=./Models
 
 # Source files
-SRCS=$(SRC_DIR)/main.c $(SRC_DIR)/util.c $(RR_DIR)/best_quantum_time_round_robin.c $(RR_DIR)/manhattan_round_robin.c $(RR_DIR)/round_robin.c $(MODELS_DIR)/process.c $(MODELS_DIR)/process_result.c $(MODELS_DIR)/round_robin_result.c
+SRCS=$(SRC_DIR)/main.c $(SRC_DIR)/util.c $(RR_DIR)/best_quantum_time_round_robin.c $(RR_DIR)/manhattan_round_robin.c $(RR_DIR)/round_robin.c
 
 # Object files
 OBJS=$(SRCS:.c=.o)
 
 # Header files
-HDRS=$(RR_DIR)/best_quantum_time_round_robin.h $(RR_DIR)/manhattan_round_robin.h $(RR_DIR)/round_robin.h $(MODELS_DIR)/process.h $(MODELS_DIR)/process_result.h $(MODELS_DIR)/round_robin_result.h
+HDRS=$(SRC_DIR)/util.h $(RR_DIR)/best_quantum_time_round_robin.h $(RR_DIR)/manhattan_round_robin.h $(RR_DIR)/round_robin.h $(MODELS_DIR)/process.h $(MODELS_DIR)/process_result.h $(MODELS_DIR)/round_robin_result.h
 
 # Output executable name
 OUTPUT=program

@@ -28,6 +28,5 @@ RoundRobinResult manhattan_round_robin(Process *processes, int processesSize){
 
     RoundRobinResult result = round_robin(processes, processesSize, quantumTime);
     strcpy(result.roundRobinUsed, "Round Robin Manhattan Distance");
-
     return result;
 }
