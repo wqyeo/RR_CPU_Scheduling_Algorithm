@@ -32,7 +32,7 @@
 	"round_robin_result.h"
 	"round_robin.h"
 
-1677169113 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/main.c
+1677234594 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/main.c
 	<stdio.h>
 	<stdlib.h>
 	"Models/process.h"
@@ -40,6 +40,7 @@
 	"RoundRobin/round_robin.h"
 	"RoundRobin/manhatten_round_robin.h"
 	"RoundRobin/best_quantum_time_round_robin.h"
+	"RoundRobin/yosef_round_robin.h"
 	"util.h"
 
 1676176707 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/process.h
@@ -86,7 +87,15 @@
 	"round_robin_result.h"
 	"round_robin.h"
 
-1676287204 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/util.c
+1677234634 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/util.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/stat.h>
+	<time.h>
+	"Models/process.h"
+	"Models/process_result.h"
+	"Models/round_robin_result.h"
 
 1677169961 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/best_quantum_time_round_robin.c
 	<stdio.h>
@@ -97,7 +106,7 @@
 	"../Models/round_robin_result.h"
 	"round_robin.h"
 
-1677169844 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/Models/process.h
+1677233616 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/Models/process.h
 
 1677169846 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/Models/process_result.h
 	"process.h"
@@ -127,4 +136,15 @@
 1676287018 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/best_quantum_time_round_robin.h
 
 1677168350 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/util.h
+
+1677234579 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/yosef_round_robin.h
+
+1677234494 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/yosef_round_robin.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	"../Models/process.h"
+	"../Models/process_result.h"
+	"../Models/round_robin_result.h"
+	"round_robin.h"
 

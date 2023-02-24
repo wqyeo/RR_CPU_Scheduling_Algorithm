@@ -13,12 +13,12 @@
 
 #define MAX_ARRIVAL_TIME 20
 
-Process* generate_random_processes(processesSize){
+Process* generate_random_processes(int processesSize){
 	Process* processes = malloc(processesSize * sizeof(Process));
 	srand(time(NULL));
 	int i;
 	for (i = 0; i < processesSize; ++i){
-		char[MAX_NAME_LEN] processName;
+		char processName[MAX_NAME_LEN];
 		snprintf(processName, MAX_NAME_LEN, "P%d", i);
 		strcpy(processes[i].name, processName);
 
