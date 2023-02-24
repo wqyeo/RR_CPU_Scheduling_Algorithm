@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
+#include <limits.h>
 
 #include "../Models/process.h"
 #include "../Models/process_result.h"
@@ -37,6 +39,7 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize) {
     float median = get_median_burst_times(processes, processesSize);
     result.timeQuantum = (mean + median) / 2.0f;
 
+    char lastProcess[MAX_NAME_LEN] = "";
     // Same as simulating basic Round Robin here, except with a few changes due to the modified algorithm...
     while (1) {
         int allProcessesDoneFlag = 1;
@@ -70,12 +73,24 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize) {
                     result.processResults[i].turnaroundTime = result.processResults[i].waitingTime + processes[i].burstTime;
                     remainingTime[i] = 0;
                 }
-                result.contextSwitch += 1;
+                
+                // This process was not the same as last, context switch occured.
+                if (strcmp(lastProcess, processes[i].name) != 0){
+                    result.contextSwitch += 1;
+                    strcpy(lastProcess, processes[i].name);
+                }
             }
         }
         if (allProcessesDoneFlag == 1) {
             break;
         }
+        
+        // Not all processes are done yet
+		float nextArrivalTime = find_next_arrival_time(remainingTime, processes, processesSize);
+		if (nextArrivalTime != INT_MAX && result.totalTime < nextArrivalTime){
+			// The CPU now has to wait until the next process arrives, let the CPU wait.
+			result.totalTime += (nextArrivalTime - result.totalTime);
+		}
     }
 
     result.avgWaitingTime = 0.0f;

@@ -14,7 +14,7 @@
 #define MAX_ARRIVAL_TIME 20
 
 Process* generate_random_processes(int processesSize){
-	Process* processes = malloc(processesSize * sizeof(Process));
+	Process* processes = (Process*) malloc(processesSize * sizeof(Process));
 	srand(time(NULL));
 	int i;
 	for (i = 0; i < processesSize; ++i){

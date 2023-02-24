@@ -1,6 +1,8 @@
 // CPU Scheduling Method : Round Robin
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
+#include <string.h>
 
 #include "../Models/process.h"
 #include "../Models/process_result.h"
@@ -42,14 +44,26 @@ int get_lowest_arrival_time(Process *processes, int processesSize) {
     return lowestArrivalTime;
 }
 
+int find_next_arrival_time(float* remainingTime,Process* processes, int processesSize){
+	int lowestArrivalTime = INT_MAX;
+	for (int i = 0; i < processesSize; ++i){
+		if (remainingTime[i] <= 0.0f){
+			continue;
+		}
+
+		lowestArrivalTime = processes[i].arrivalTime;
+	}
+	return lowestArrivalTime;
+}
+
 RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum) {
     int i;
     float remainingTime[processesSize];
-
+    
     RoundRobinResult result;
     result.processResults = (ProcessResult*) malloc(processesSize * sizeof(ProcessResult));
     result.processesSize = processesSize;
-
+    
     // We start the lowest arrival time, simulate idling until a process arrives.
     result.totalTime = get_lowest_arrival_time(processes, processesSize);
     result.contextSwitch = 0;
@@ -63,6 +77,8 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
         result.processResults[i].responseTime = 0.0f;
         result.processResults[i].process = processes[i];
     }
+    
+    char lastProcess[MAX_NAME_LEN] = "";
 
     // This loop simulates the Round Robin on all of the processes.
     while (1) {
@@ -93,12 +109,24 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
                     result.processResults[i].turnaroundTime = result.processResults[i].waitingTime + processes[i].burstTime;
                     remainingTime[i] = 0;
                 }
-                result.contextSwitch += 1;
+                
+                // This process was not the same as last, context switch occured.
+                if (strcmp(lastProcess, processes[i].name) != 0){
+                    result.contextSwitch += 1;
+                    strcpy(lastProcess, processes[i].name);
+                }
             }
         }
         if (allProcessesDoneFlag == 1) {
             break;
         }
+
+		// Not all processes are done yet
+		float nextArrivalTime = find_next_arrival_time(remainingTime, processes, processesSize);
+		if (nextArrivalTime != INT_MAX && result.totalTime < nextArrivalTime){
+			// The CPU now has to wait until the next process arrives, let the CPU wait.
+			result.totalTime += (nextArrivalTime - result.totalTime);
+		}
     }
 
     // Calculate average of times
