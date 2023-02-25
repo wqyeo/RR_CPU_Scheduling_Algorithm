@@ -42,6 +42,13 @@ void save_result_to_file(char* fileName, RoundRobinResult result) {
 	char extensionName[] = ".dat";
 	char filePath[512] = "";
 
+    // Create folder if it doesn't exist
+    struct stat st = {0};
+    if (stat("analysis_data", &st) == -1) {
+        mkdir("analysis_data", 0700);
+    }
+
+	strcat(filePath, "analysis_data/");
 	strcat(filePath, fileName);
 	strcat(filePath, extensionName);
     filePointer = fopen(filePath, "w+");
@@ -51,6 +58,7 @@ void save_result_to_file(char* fileName, RoundRobinResult result) {
         return;
     }
 
+	fprintf(filePointer, "<START OF FILE>\n\n");
 	append_main_result(filePointer, result);
 
 	int i;
