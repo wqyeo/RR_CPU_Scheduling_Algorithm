@@ -58,6 +58,6 @@ void save_result_to_file(char* fileName, RoundRobinResult result) {
 		ProcessResult processResult = result.processResults[i];
 		append_process_result(filePointer, processResult);
 	}
-
+	fprintf(filePointer, "\n<END OF FILE>");
     fclose(filePointer);
 }

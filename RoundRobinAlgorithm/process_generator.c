@@ -7,11 +7,9 @@
 #include "Models/process.h"
 #include "Models/process_result.h"
 #include "Models/round_robin_result.h"
+#include "Util/color_print.h"
 
-#define MAX_BURST_TIME 54
-#define MIN_BURST_TIME 1
-
-#define MAX_ARRIVAL_TIME 20
+#include "process_generator.h"
 
 Process* generate_random_processes(int processesSize){
 	Process* processes = (Process*) malloc(processesSize * sizeof(Process));
