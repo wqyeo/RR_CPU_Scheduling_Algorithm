@@ -19,6 +19,21 @@
 
 #define MAX_DATETIME_LEN 32
 
+char *generate_random_string(int length) {
+    static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    char *random_string = malloc(sizeof(char) * (length + 1));
+    srand(time(NULL));
+    
+    for (int i = 0; i < length; i++) {
+        int index = rand() % (int)(sizeof(charset) - 1);
+        random_string[i] = charset[index];
+    }
+    
+    random_string[length] = '\0';
+    
+    return random_string;
+}
+
 char* get_current_datetime_string() {
     char* datetime = malloc(MAX_DATETIME_LEN * sizeof(char));
     if (!datetime) {
@@ -151,7 +166,7 @@ RoundRobinMode request_round_robin_mode(){
     return userInput;
 }
 
-RoundRobinResult perform_round_robin(Process *processes, int processesCount){
+RoundRobinResult perform_round_robin(Process *processes, int processesCount, char* groupingString){
     float timeQuantum;
     // Re-request until valid input is entered for burst time
     while (1) {
@@ -164,7 +179,7 @@ RoundRobinResult perform_round_robin(Process *processes, int processesCount){
       }
     }
 
-    return round_robin(processes, processesCount, timeQuantum);
+    return round_robin(processes, processesCount, timeQuantum, groupingString);
 }
 
 // Deep clone
@@ -192,10 +207,11 @@ void run_round_robin_tests(RunMode runMode){
     }
 
     RoundRobinMode roundRobinToUse = request_round_robin_mode();
-    if (roundRobinToUse == ALL){
+    char* groupingString = generate_random_string(62);
+	if (roundRobinToUse == ALL){
         // Simulate Round Robin first
         Process* roundRobinProcesses = clone_processes(processes, processCount);
-        RoundRobinResult roundRobinResult = perform_round_robin(roundRobinProcesses, processCount);
+        RoundRobinResult roundRobinResult = perform_round_robin(roundRobinProcesses, processCount, groupingString);
         // Print and save
         print_round_robin_result(roundRobinResult);
         char fileName[] = "RoundRobin_";
@@ -207,7 +223,7 @@ void run_round_robin_tests(RunMode runMode){
         PRINT_BLUE("\n=================\n");
 
         Process* manhattanProcesses = clone_processes(processes, processCount);
-        RoundRobinResult manhattanResult = manhattan_round_robin(manhattanProcesses, processCount);
+        RoundRobinResult manhattanResult = manhattan_round_robin(manhattanProcesses, processCount, groupingString);
         print_round_robin_result(manhattanResult);
         strcpy(fileName, "Manhattan_");
         strcat(fileName, get_current_datetime_string());
@@ -218,7 +234,7 @@ void run_round_robin_tests(RunMode runMode){
         PRINT_BLUE("\n=================\n");
 
         Process* bestQuantumProcess = clone_processes(processes, processCount);
-        RoundRobinResult modifiedResult = modified_round_robin(bestQuantumProcess, processCount);
+        RoundRobinResult modifiedResult = modified_round_robin(bestQuantumProcess, processCount, groupingString);
         print_round_robin_result(modifiedResult);
         strcpy(fileName, "BestTimeQuantum_");
         strcat(fileName, get_current_datetime_string());
@@ -228,7 +244,7 @@ void run_round_robin_tests(RunMode runMode){
         free(modifiedResult.processResults);
         PRINT_BLUE("\n=================\n");
     } else if (roundRobinToUse == ROUND_ROBIN){
-        RoundRobinResult roundRobinResult = perform_round_robin(processes, processCount);
+        RoundRobinResult roundRobinResult = perform_round_robin(processes, processCount, groupingString);
         print_round_robin_result(roundRobinResult);
         char fileName[] = "RoundRobin_";
         strcat(fileName, get_current_datetime_string());
@@ -236,7 +252,7 @@ void run_round_robin_tests(RunMode runMode){
 
         free(roundRobinResult.processResults);
     } else if (roundRobinToUse == MANHATTEN_ROUND_ROBIN){
-        RoundRobinResult manhattanResult = manhattan_round_robin(processes, processCount);
+        RoundRobinResult manhattanResult = manhattan_round_robin(processes, processCount, groupingString);
         print_round_robin_result(manhattanResult);
         char fileName[] = "Manhattan_";
         strcat(fileName, get_current_datetime_string());
@@ -244,7 +260,7 @@ void run_round_robin_tests(RunMode runMode){
 
         free(manhattanResult.processResults);
     } else if (roundRobinToUse == BEST_QUANTUM_TIME_ROUND_ROBIN){
-        RoundRobinResult bestQuantumTimeResult = modified_round_robin(processes, processCount);
+        RoundRobinResult bestQuantumTimeResult = modified_round_robin(processes, processCount, groupingString);
         print_round_robin_result(bestQuantumTimeResult);
         char fileName[] = "BestQuantumTime_";
         strcat(fileName, get_current_datetime_string());

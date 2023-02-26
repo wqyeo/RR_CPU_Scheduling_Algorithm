@@ -56,11 +56,12 @@ int find_next_arrival_time(float* remainingTime,Process* processes, int processe
 	return lowestArrivalTime;
 }
 
-RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum) {
+RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum, char* grouping) {
     int i;
     float remainingTime[processesSize];
     
     RoundRobinResult result;
+	strcpy(result.grouping, grouping);
     result.processResults = (ProcessResult*) malloc(processesSize * sizeof(ProcessResult));
     result.processesSize = processesSize;
     

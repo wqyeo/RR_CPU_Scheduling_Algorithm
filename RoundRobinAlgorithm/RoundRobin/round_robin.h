@@ -9,6 +9,6 @@ int get_lowest_arrival_time(Process *processes, int processesSize);
 // Find the lowest arrival time from the undone process.
 int find_next_arrival_time(float* remainingTime,Process* processes, int processesSize);
 
-RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum);
+RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum, char* grouping);
 
 #endif

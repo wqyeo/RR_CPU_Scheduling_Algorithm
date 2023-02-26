@@ -11,11 +11,12 @@
 
 #include "round_robin.h"
 
-RoundRobinResult modified_round_robin(Process *processes, int processesSize) {
+RoundRobinResult modified_round_robin(Process *processes, int processesSize, char* grouping) {
     RoundRobinResult result;
     int i;
     float remainingTime[processesSize];
 
+	strcpy(result.grouping, grouping);
     result.processesSize = processesSize;
     result.processResults = (ProcessResult *)malloc(sizeof(ProcessResult) * processesSize);
     // Start at the lowest arrival time, simulate idling until first process comes.
