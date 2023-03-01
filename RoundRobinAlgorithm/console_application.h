@@ -11,7 +11,8 @@ typedef enum {
 
 typedef enum {
   MANUAL,
-  AUTOMATED
+  AUTOMATED,
+  GENERATOR
 } RunMode;
 
 typedef enum {

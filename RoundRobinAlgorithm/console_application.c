@@ -18,6 +18,7 @@
 #include "Util/data_saver.h"
 
 #define MAX_DATETIME_LEN 32
+#define DEFAULT_TIME_QUANTUM 5
 
 char *generate_random_string(int length) {
   static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -166,10 +167,10 @@ RoundRobinMode request_round_robin_mode(){
   return userInput;
 }
 
-RoundRobinResult perform_round_robin(Process *processes, int processesCount, char* groupingString){
+RoundRobinResult perform_round_robin(Process *processes, int processesCount, char* groupingString, RunMode runMode){
   float timeQuantum;
   // Re-request until valid input is entered for burst time
-  while (1) {
+  while (1 && runMode != GENERATOR) {
     printf("Enter Quantum Time for Round Robin ");
     if (scanf("%f", &timeQuantum) == 1) {
       break;
@@ -177,6 +178,10 @@ RoundRobinResult perform_round_robin(Process *processes, int processesCount, cha
       printf("Invalid input. Please enter a valid number.\n");
       clear_input_buffer();
     }
+  }
+
+  if (runMode == GENERATOR){
+    timeQuantum = DEFAULT_TIME_QUANTUM;
   }
 
   return round_robin(processes, processesCount, timeQuantum, groupingString);
@@ -197,7 +202,7 @@ Process* clone_processes(Process* processes, int size) {
   return new_processes;
 }
 
-void run_round_robin_tests(RunMode runMode, int processCount){
+void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExtender){
   Process* processes;
   if (runMode == MANUAL) {
     processes = request_processes(processCount);
@@ -205,8 +210,14 @@ void run_round_robin_tests(RunMode runMode, int processCount){
     processes = generate_random_processes(processCount);
   }
 
+  RoundRobinMode roundRobinToUse;
+  if (runMode == GENERATOR) {
+    roundRobinToUse = ALL;
+  } else {
+    RoundRobinMode roundRobinToUse = request_round_robin_mode();
+  }
 
-  RoundRobinMode roundRobinToUse = request_round_robin_mode();
+  char fileName[54] = "";
   char* groupingString = generate_random_string(62);
   // TODO: Refactor; Does this:
   // If round robin to use is all, perform all round Robin.
@@ -215,11 +226,12 @@ void run_round_robin_tests(RunMode runMode, int processCount){
   if (roundRobinToUse == ALL){
     // Simulate Round Robin first
     Process* roundRobinProcesses = clone_processes(processes, processCount);
-    RoundRobinResult roundRobinResult = perform_round_robin(roundRobinProcesses, processCount, groupingString);
+    RoundRobinResult roundRobinResult = perform_round_robin(roundRobinProcesses, processCount, groupingString, runMode);
     // Print and save
     print_round_robin_result(roundRobinResult);
-    char fileName[] = "RoundRobin_";
+    strcpy(fileName,"RoundRobin_");
     strcat(fileName, get_current_datetime_string());
+    strcat(fileName, fileNameExtender);
     save_result_to_file(fileName, roundRobinResult);
     // Free memory
     free(roundRobinProcesses);
@@ -231,6 +243,7 @@ void run_round_robin_tests(RunMode runMode, int processCount){
     print_round_robin_result(manhattanResult);
     strcpy(fileName, "Manhattan_");
     strcat(fileName, get_current_datetime_string());
+    strcat(fileName, fileNameExtender);
     save_result_to_file(fileName, manhattanResult);
 
     free(manhattanProcesses);
@@ -242,15 +255,16 @@ void run_round_robin_tests(RunMode runMode, int processCount){
     print_round_robin_result(modifiedResult);
     strcpy(fileName, "BestTimeQuantum_");
     strcat(fileName, get_current_datetime_string());
+    strcat(fileName, fileNameExtender);
     save_result_to_file(fileName, modifiedResult);
 
     free(bestQuantumProcess);
     free(modifiedResult.processResults);
     PRINT_BLUE("\n=================\n");
   } else if (roundRobinToUse == ROUND_ROBIN){
-  RoundRobinResult roundRobinResult = perform_round_robin(processes, processCount, groupingString);
+  RoundRobinResult roundRobinResult = perform_round_robin(processes, processCount, groupingString, runMode);
   print_round_robin_result(roundRobinResult);
-  char fileName[] = "RoundRobin_";
+  strcpy(fileName, "RoundRobin_");
   strcat(fileName, get_current_datetime_string());
   save_result_to_file(fileName, roundRobinResult);
 
@@ -258,7 +272,7 @@ void run_round_robin_tests(RunMode runMode, int processCount){
 } else if (roundRobinToUse == MANHATTEN_ROUND_ROBIN){
   RoundRobinResult manhattanResult = manhattan_round_robin(processes, processCount, groupingString);
   print_round_robin_result(manhattanResult);
-  char fileName[] = "Manhattan_";
+  strcpy(fileName, "Manhattan_");
   strcat(fileName, get_current_datetime_string());
   save_result_to_file(fileName, manhattanResult);
 
@@ -266,23 +280,43 @@ void run_round_robin_tests(RunMode runMode, int processCount){
 } else if (roundRobinToUse == BEST_QUANTUM_TIME_ROUND_ROBIN){
   RoundRobinResult bestQuantumTimeResult = modified_round_robin(processes, processCount, groupingString);
   print_round_robin_result(bestQuantumTimeResult);
-  char fileName[] = "BestQuantumTime_";
+  strcpy(fileName, "BestTimeQuantum_");
   strcat(fileName, get_current_datetime_string());
   save_result_to_file(fileName, bestQuantumTimeResult);
 
   free(bestQuantumTimeResult.processResults);
 }
-  //  TODO: Fix Stack Smashing detected
   free(processes);
+  free(groupingString);
+}
+
+
+char* int_to_string(int num) {
+    // Allocate memory for string
+    char* str = malloc((sizeof(char) * 8) + 1);
+    if (!str) {
+        return 0;
+    }
+
+    sprintf(str, "%d", num);
+    return str;
 }
 
 void repeat_do_test(int repeatCount) {
 
+  char fileNameExtender[32] = "_";
   int i = 0;
   while (i < repeatCount) {
     int processesCount = (rand() % 25) + 25;
+
+    strcpy(fileNameExtender, "_");
+    char* iStr = int_to_string(i);
+    strcat(fileNameExtender, iStr);
+
+    run_round_robin_tests(GENERATOR, processesCount, fileNameExtender);
     ++i;
-    run_round_robin_tests(AUTOMATED, processesCount);
+
+    free(iStr);
   }
 }
 
@@ -293,8 +327,9 @@ void run_application(){
   while (1) {
     PRINT_WHITE("\nSelect Mode:\n");
     PRINT_GRAY("1 (Manual) - Manually input processes.\n");
-    PRINT_GRAY("2 (Auto) - Automatically generate processes.\n");
-    PRINT_WHITE("(1/2/EXIT):\n");
+    PRINT_GRAY("2 (Auto) - Automatically generate processes, input the niches of the Round Robin.\n");
+    PRINT_GRAY("3 (Generate) - Runs everything automatically by randomly generating all the inputs.\n");
+    PRINT_WHITE("(1/2/3/EXIT):\n");
     fgets(inputStr, MAX_USER_INPUT_SIZE, stdin);
 
     // Remove the 'enter' key
@@ -304,13 +339,15 @@ void run_application(){
       inputStr[i] = tolower(inputStr[i]);
     }
 
-
     if (strcmp(inputStr, "1") == 0 || strcmp(inputStr, "manual") == 0) {
       int processCount = request_processes_count();
-      run_round_robin_tests(MANUAL, processCount);
+      run_round_robin_tests(MANUAL, processCount, "");
     } else if (strcmp(inputStr, "2") == 0 || strcmp (inputStr, "auto") == 0) {
       int processCount = request_processes_count();
-      run_round_robin_tests(AUTOMATED, processCount);
+      run_round_robin_tests(AUTOMATED, processCount, "");
+    } else if (strcmp(inputStr, "3") == 0 || strcmp(inputStr, "generate") == 0){
+      // NOTE: Probably can generate this test case count as well.
+      repeat_do_test(30);
     } else if (strcmp(inputStr, "exit") == 0) {
       break;
     } else {
