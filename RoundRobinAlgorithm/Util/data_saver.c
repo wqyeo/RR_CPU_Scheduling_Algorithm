@@ -12,6 +12,7 @@ void append_main_result(FILE* filePointer, RoundRobinResult result){
 	if (filePointer == NULL){return;}
 
 	fprintf(filePointer, "[%s]\n", result.roundRobinUsed);
+	fprintf(filePointer, "grouping=%s\n", result.grouping);
 	fprintf(filePointer, "time_quantum=%f\n", result.timeQuantum);
 
 	fprintf(filePointer, "average_waiting_time=%f\n", result.avgWaitingTime);

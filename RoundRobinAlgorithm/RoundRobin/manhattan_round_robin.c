@@ -1,12 +1,13 @@
 // Optimal Round Robin CPU Scheduling Algorithm using Manhattan Distance
 #include <float.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "../Models/process.h"
 #include "../Models/round_robin_result.h"
 #include "round_robin.h"
 
-RoundRobinResult manhattan_round_robin(Process *processes, int processesSize){
+RoundRobinResult manhattan_round_robin(Process *processes, int processesSize, char* grouping){
     float max = FLT_MIN;
     float min = FLT_MAX;
 
@@ -26,7 +27,7 @@ RoundRobinResult manhattan_round_robin(Process *processes, int processesSize){
         quantumTime = processes[0].burstTime;
     }
 
-    RoundRobinResult result = round_robin(processes, processesSize, quantumTime);
+    RoundRobinResult result = round_robin(processes, processesSize, quantumTime, grouping);
     strcpy(result.roundRobinUsed, "Round Robin Manhattan Distance");
     return result;
 }
