@@ -197,8 +197,7 @@ Process* clone_processes(Process* processes, int size) {
   return new_processes;
 }
 
-void run_round_robin_tests(RunMode runMode){
-  int processCount = request_processes_count();
+void run_round_robin_tests(RunMode runMode, int processCount){
   Process* processes;
   if (runMode == MANUAL) {
     processes = request_processes(processCount);
@@ -206,8 +205,13 @@ void run_round_robin_tests(RunMode runMode){
     processes = generate_random_processes(processCount);
   }
 
+
   RoundRobinMode roundRobinToUse = request_round_robin_mode();
   char* groupingString = generate_random_string(62);
+  // TODO: Refactor; Does this:
+  // If round robin to use is all, perform all round Robin.
+  // else, perform the respective specificed round robin that is provided;
+  // Remember to save process data
   if (roundRobinToUse == ALL){
     // Simulate Round Robin first
     Process* roundRobinProcesses = clone_processes(processes, processCount);
@@ -266,10 +270,20 @@ void run_round_robin_tests(RunMode runMode){
   strcat(fileName, get_current_datetime_string());
   save_result_to_file(fileName, bestQuantumTimeResult);
 
-free(bestQuantumTimeResult.processResults);
+  free(bestQuantumTimeResult.processResults);
+}
+  //  TODO: Fix Stack Smashing detected
+  free(processes);
 }
 
-  free(processes);
+void repeat_do_test(int repeatCount) {
+
+  int i = 0;
+  while (i < repeatCount) {
+    int processesCount = (rand() % 25) + 25;
+    ++i;
+    run_round_robin_tests(AUTOMATED, processesCount);
+  }
 }
 
 void run_application(){
@@ -292,9 +306,11 @@ void run_application(){
 
 
     if (strcmp(inputStr, "1") == 0 || strcmp(inputStr, "manual") == 0) {
-      run_round_robin_tests(MANUAL);
+      int processCount = request_processes_count();
+      run_round_robin_tests(MANUAL, processCount);
     } else if (strcmp(inputStr, "2") == 0 || strcmp (inputStr, "auto") == 0) {
-      run_round_robin_tests(AUTOMATED);
+      int processCount = request_processes_count();
+      run_round_robin_tests(AUTOMATED, processCount);
     } else if (strcmp(inputStr, "exit") == 0) {
       break;
     } else {
