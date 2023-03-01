@@ -1,6 +1,7 @@
 from models.analysis_group import AnalysisGroup
 from models.analysis_data import AnalysisData
 from data_reader import read_from_file
+from plotter import plot_graph_analysis
 
 import matplotlib as plt
 from os import listdir
@@ -32,3 +33,5 @@ for data in analysis_datas:
         new_grouping = AnalysisGroup()
         new_grouping.data_group.append(data)
         analysis_groupings[data.grouping] = new_grouping
+
+plot_graph_analysis(analysis_groupings, "test.png")
