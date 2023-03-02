@@ -1,7 +1,7 @@
 // CPU Scheduling Method : Round Robin
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
+#include <float.h>
 #include <string.h>
 
 #include "../Models/process.h"
@@ -34,8 +34,8 @@ float get_median_burst_times(Process *processes, int processesSize) {
   }
 }
 
-int get_lowest_arrival_time(Process *processes, int processesSize) {
-  int lowestArrivalTime = INT_MAX;
+float get_lowest_arrival_time(Process *processes, int processesSize) {
+  float lowestArrivalTime = FLT_MAX;
   for (int i = 0; i < processesSize; i++) {
     if (processes[i].arrivalTime < lowestArrivalTime) {
       lowestArrivalTime = processes[i].arrivalTime;
@@ -44,14 +44,24 @@ int get_lowest_arrival_time(Process *processes, int processesSize) {
   return lowestArrivalTime;
 }
 
-int find_next_arrival_time(float* remainingTime,Process* processes, int processesSize){
-  int lowestArrivalTime = INT_MAX;
+/**
+ * Same as get_lowest_arrival_time, but this function considers if the process is done or not.
+ *
+ * @param remainingTime The array indicating the time remaining to complete the processes.
+ * @param processes The array of processes.
+ * @param processesSize Number of processes.
+ * @return The lowest arrival time of an undone process. FLT_MAX if none.
+ */
+float find_next_arrival_time(float* remainingTime,Process* processes, int processesSize){
+  float lowestArrivalTime = FLT_MAX;
   for (int i = 0; i < processesSize; ++i){
     if (remainingTime[i] <= 0.0f){
       continue;
     }
 
-    lowestArrivalTime = processes[i].arrivalTime;
+    if (lowestArrivalTime > processes[i].arrivalTime){
+      lowestArrivalTime = processes[i].arrivalTime;
+    }
   }
   return lowestArrivalTime;
 }
@@ -121,7 +131,7 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
 
     // Not all processes are done yet
     float nextArrivalTime = find_next_arrival_time(remainingTime, processes, processesSize);
-    if (nextArrivalTime != INT_MAX && result.totalTime < nextArrivalTime){
+    if (nextArrivalTime != FLT_MAX && result.totalTime < nextArrivalTime){
       // The CPU now has to wait until the next process arrives, let the CPU wait.
       result.totalTime += (nextArrivalTime - result.totalTime);
       allProcessesDoneFlag = 0;

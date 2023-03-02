@@ -127,9 +127,9 @@ Process *request_processes(int size) {
   return processes;
 }
 
-RoundRobinMode request_round_robin_mode(){
-  RoundRobinMode userInput;
+_RoundRobinArray request_round_robin_mode(){
   char inputStr[MAX_USER_INPUT_SIZE];
+  RoundRobinMode* modeArray = malloc(3 * sizeof(RoundRobinMode));;
 
   while (1) {
     PRINT_WHITE("\nSelect Mode:\n");
@@ -139,7 +139,6 @@ RoundRobinMode request_round_robin_mode(){
     PRINT_GRAY("4 - Best Quantum Time Round Robin\n");
     PRINT_WHITE("(1/2/3/4):\n");
     fgets(inputStr, MAX_USER_INPUT_SIZE, stdin);
-
     // Remove the 'enter' key
     inputStr[strcspn(inputStr, "\n")] = '\0';
 
@@ -147,24 +146,27 @@ RoundRobinMode request_round_robin_mode(){
       inputStr[i] = tolower(inputStr[i]);
     }
 
-
     if (strcmp(inputStr, "1") == 0) {
-      userInput = ALL;
-      break;
+      modeArray[0] = ROUND_ROBIN;
+      modeArray[1] = MANHATTEN_ROUND_ROBIN;
+      modeArray[2] = BEST_QUANTUM_TIME_ROUND_ROBIN;
+
+      return (_RoundRobinArray){.modes = modeArray, .size = 3};
     } else if (strcmp(inputStr, "2") == 0) {
-      userInput = ROUND_ROBIN;
-      break;
+      modeArray[0] = ROUND_ROBIN;
+      return (_RoundRobinArray){.modes = modeArray, .size = 1};
     } else if (strcmp(inputStr, "3") == 0) {
-      userInput = MANHATTEN_ROUND_ROBIN;
-      break;
+      modeArray[0] = MANHATTEN_ROUND_ROBIN;
+      return (_RoundRobinArray){.modes = modeArray, .size = 1};
     } else if (strcmp(inputStr, "4") == 0) {
-      userInput = BEST_QUANTUM_TIME_ROUND_ROBIN;
-      break;
+      modeArray[0] = BEST_QUANTUM_TIME_ROUND_ROBIN;
+      return (_RoundRobinArray){.modes = modeArray, .size = 1};
     } else {
       PRINT_YELLOW("Invalid input. Please enter 1, 2, 3, 4.\n");
     }
   }
-  return userInput;
+  // Shouldn't reach here.
+  return (_RoundRobinArray){.modes = modeArray, .size = 0};
 }
 
 RoundRobinResult perform_round_robin(Process *processes, int processesCount, char* groupingString, RunMode runMode){
@@ -202,7 +204,7 @@ Process* clone_processes(Process* processes, int size) {
   return new_processes;
 }
 
-void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExtender){
+void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExtender) {
   Process* processes;
   if (runMode == MANUAL) {
     processes = request_processes(processCount);
@@ -210,84 +212,59 @@ void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExte
     processes = generate_random_processes(processCount);
   }
 
-  RoundRobinMode roundRobinToUse;
+  _RoundRobinArray roundRobinsToUse;
   if (runMode == GENERATOR) {
-    roundRobinToUse = ALL;
+    RoundRobinMode* roundRobinModes = malloc(3 * sizeof(RoundRobinMode));
+    roundRobinModes[0] = ROUND_ROBIN;
+    roundRobinModes[1] = MANHATTEN_ROUND_ROBIN;
+    roundRobinModes[2] = BEST_QUANTUM_TIME_ROUND_ROBIN;
+
+    roundRobinsToUse.modes = roundRobinModes;
+    roundRobinsToUse.size = 3;
   } else {
-    RoundRobinMode roundRobinToUse = request_round_robin_mode();
+    roundRobinsToUse = request_round_robin_mode();
   }
 
   char fileName[54] = "";
   char* groupingString = generate_random_string(62);
-  // TODO: Refactor; Does this:
-  // If round robin to use is all, perform all round Robin.
-  // else, perform the respective specificed round robin that is provided;
-  // Remember to save process data
-  if (roundRobinToUse == ALL){
-    // Simulate Round Robin first
-    Process* roundRobinProcesses = clone_processes(processes, processCount);
-    RoundRobinResult roundRobinResult = perform_round_robin(roundRobinProcesses, processCount, groupingString, runMode);
-    // Print and save
-    print_round_robin_result(roundRobinResult);
-    strcpy(fileName,"RoundRobin_");
-    strcat(fileName, get_current_datetime_string());
-    strcat(fileName, fileNameExtender);
-    save_result_to_file(fileName, roundRobinResult);
-    // Free memory
-    free(roundRobinProcesses);
-    free(roundRobinResult.processResults);
-    PRINT_BLUE("\n=================\n");
 
-    Process* manhattanProcesses = clone_processes(processes, processCount);
-    RoundRobinResult manhattanResult = manhattan_round_robin(manhattanProcesses, processCount, groupingString);
-    print_round_robin_result(manhattanResult);
-    strcpy(fileName, "Manhattan_");
-    strcat(fileName, get_current_datetime_string());
-    strcat(fileName, fileNameExtender);
-    save_result_to_file(fileName, manhattanResult);
+  for (size_t i = 0; i < roundRobinsToUse.size; ++i) {
+      // Clone the process, and used the cloned process,
+      // to prevent modifying the original.
+      // (Original needed if we are to perform more round robin simulations)
+      Process* clonedProcesses = clone_processes(processes, processCount);
+      RoundRobinResult roundRobinResult;
+      int simulatedFlag = 1;
+      if (roundRobinsToUse.modes[i] == ROUND_ROBIN){
+        strcpy(fileName,"RoundRobin_");
+        roundRobinResult = perform_round_robin(clonedProcesses, processCount, groupingString, runMode);
+      } else if (roundRobinsToUse.modes[i] == MANHATTEN_ROUND_ROBIN){
+        strcpy(fileName,"Manhatten_");
+        roundRobinResult = manhattan_round_robin(clonedProcesses, processCount, groupingString);
+      } else if (roundRobinsToUse.modes[i] == BEST_QUANTUM_TIME_ROUND_ROBIN){
+        strcpy(fileName,"BestTimeQuantum_");
+        roundRobinResult = modified_round_robin(clonedProcesses, processCount, groupingString);
+      } else {
+        PRINT_RED("Unimplemented Round Robin mode called");
+        simulatedFlag = 0;
+        continue;
+      }
 
-    free(manhattanProcesses);
-    free(manhattanResult.processResults);
-    PRINT_BLUE("\n=================\n");
+      if (simulatedFlag == 1){
+        print_round_robin_result(roundRobinResult);
+        strcat(fileName, get_current_datetime_string());
+        strcat(fileName, fileNameExtender);
+        save_result_to_file(fileName, roundRobinResult);
+        free(roundRobinResult.processResults);
+      }
 
-    Process* bestQuantumProcess = clone_processes(processes, processCount);
-    RoundRobinResult modifiedResult = modified_round_robin(bestQuantumProcess, processCount, groupingString);
-    print_round_robin_result(modifiedResult);
-    strcpy(fileName, "BestTimeQuantum_");
-    strcat(fileName, get_current_datetime_string());
-    strcat(fileName, fileNameExtender);
-    save_result_to_file(fileName, modifiedResult);
+      free(clonedProcesses);
+      PRINT_BLUE("\n=================\n");
+  }
 
-    free(bestQuantumProcess);
-    free(modifiedResult.processResults);
-    PRINT_BLUE("\n=================\n");
-  } else if (roundRobinToUse == ROUND_ROBIN){
-  RoundRobinResult roundRobinResult = perform_round_robin(processes, processCount, groupingString, runMode);
-  print_round_robin_result(roundRobinResult);
-  strcpy(fileName, "RoundRobin_");
-  strcat(fileName, get_current_datetime_string());
-  save_result_to_file(fileName, roundRobinResult);
-
-  free(roundRobinResult.processResults);
-} else if (roundRobinToUse == MANHATTEN_ROUND_ROBIN){
-  RoundRobinResult manhattanResult = manhattan_round_robin(processes, processCount, groupingString);
-  print_round_robin_result(manhattanResult);
-  strcpy(fileName, "Manhattan_");
-  strcat(fileName, get_current_datetime_string());
-  save_result_to_file(fileName, manhattanResult);
-
-  free(manhattanResult.processResults);
-} else if (roundRobinToUse == BEST_QUANTUM_TIME_ROUND_ROBIN){
-  RoundRobinResult bestQuantumTimeResult = modified_round_robin(processes, processCount, groupingString);
-  print_round_robin_result(bestQuantumTimeResult);
-  strcpy(fileName, "BestTimeQuantum_");
-  strcat(fileName, get_current_datetime_string());
-  save_result_to_file(fileName, bestQuantumTimeResult);
-
-  free(bestQuantumTimeResult.processResults);
-}
-  free(processes);
+  free(roundRobinsToUse.modes);
   free(groupingString);
+  free(processes);
 }
 
 
@@ -303,7 +280,6 @@ char* int_to_string(int num) {
 }
 
 void repeat_do_test(int repeatCount) {
-
   char fileNameExtender[32] = "_";
   int i = 0;
   while (i < repeatCount) {
@@ -320,7 +296,7 @@ void repeat_do_test(int repeatCount) {
   }
 }
 
-void run_application(){
+void run_application() {
   PRINT_WHITE("Round Robin Simulator...\n");
   char inputStr[MAX_USER_INPUT_SIZE];
 
