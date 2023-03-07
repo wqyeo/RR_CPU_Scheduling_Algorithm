@@ -8,124 +8,221 @@
 #include "../Models/process.h"
 #include "../Models/process_result.h"
 #include "../Models/round_robin_result.h"
+#include "../Util/color_print.h"
 
+#include "EFPRR.h"
 #include "round_robin.h"
 
-float calc_active_burst_average(Process *processes, float *remainingTime, int processesSize, float currentTime){
-    printf("============\n");
-    float numOfRemaining = 0;
-    float sumOfProcessesBurst = 0;
-    for(int i = 0 ; i < processesSize ; i++){
-        if(remainingTime[i] > 0.0f && currentTime >= processes[i].arrivalTime){
-            printf("%s", processes[i].name);
-            numOfRemaining += 1.0f;
-            sumOfProcessesBurst += processes[i].burstTime;
-        }
-    }
-    return sumOfProcessesBurst / numOfRemaining;
+int compare_ready_processes(const void *a, const void *b)
+{
+    ReadyProcess *p1 = (ReadyProcess *)a;
+    ReadyProcess *p2 = (ReadyProcess *)b;
+
+    return p1->burstTime - p2->burstTime;
 }
 
 
-RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping) {
-  RoundRobinResult result;
-  int i;
-  float remainingTime[processesSize];
+RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
+{
+    RoundRobinResult result;
+    int i, j;
 
-  strcpy(result.grouping, grouping);
-  result.processesSize = processesSize;
-  result.processResults = (ProcessResult *)malloc(sizeof(ProcessResult) * processesSize);
-  // Start at the lowest arrival time, simulate idling until first process comes.
-  result.totalTime = get_lowest_arrival_time(processes, processesSize);
-  result.contextSwitch = 0;
+    // This array will be used to keep track of what processes we have added into the ready queue before,
+    // which hasn't been added yet.
+    int addedProcessFlag[processesSize];
 
-  // Sort from shortest to longest burst time.
-  qsort(processes, processesSize, sizeof(Process), compare_processes);
-    Process* readyQueue = (Process*) malloc(sizeof(Process) * processesSize);
     int readyQueueSize = 0;
+    ReadyProcess* readyQueue = (ReadyProcess*) malloc(sizeof(ReadyProcess) * processesSize);
 
-  // init
-  for (i = 0; i < processesSize; i++) {
-    remainingTime[i] = processes[i].burstTime;
-    result.processResults[i].waitingTime = 0.0f;
-    result.processResults[i].turnaroundTime = 0.0f;
-    result.processResults[i].responseTime = 0.0f;
-    result.processResults[i].process = processes[i];
+    strcpy(result.grouping, grouping);
+    result.processesSize = processesSize;
+    result.processResults = (ProcessResult*) malloc(sizeof(ProcessResult) * processesSize);
+    // Start at the lowest arrival time, simulate idling until first process comes.
+    result.totalTime = get_lowest_arrival_time(processes, processesSize);
+    result.contextSwitch = 0;
 
-    if (processes[i].arrivalTime <= result.totalTime){
-        readyQueue[readyQueueSize] = processes[i];
-        ++readyQueueSize;
+    for (i = 0; i < processesSize; ++i) {
+        result.processResults[i].waitingTime = 0.0f;
+        result.processResults[i].turnaroundTime = 0.0f;
+        result.processResults[i].responseTime = -1.0f;
+        result.processResults[i].process = processes[i];
+
+        // Process arrives at the start, add to ready queue.
+        if (processes[i].arrivalTime <= result.totalTime) {
+            strcpy(readyQueue[readyQueueSize].processName, processes[i].name);
+            readyQueue[readyQueueSize].remainingTime = processes[i].burstTime;
+            readyQueue[readyQueueSize].burstTime = processes[i].burstTime;
+            ++readyQueueSize;
+
+            // Mark the position of the process has been added.
+            addedProcessFlag[i] = 1;
+        } else {
+            addedProcessFlag[i] = 0;
+        }
     }
-  }
-    result.timeQuantum = calc_active_burst_average(processes, remainingTime, processesSize, result.totalTime) * 0.85f;
+
+    qsort(readyQueue, readyQueueSize, sizeof(ReadyProcess), compare_ready_processes);
+
+    char lastProcess[MAX_NAME_LEN] = "";
+    while (1) {
+        int processExecutedFlag = 0;
+        for (i = 0; i < readyQueueSize; i++) {
+
+            // Calculate time quantum by (Average Burst Time / Number of processes) * 0.85f;
+            result.timeQuantum = 0.0f;
+            int numOfProcesses = 0;
+            for (j = 0; j < readyQueueSize; ++j){
+                if (readyQueue[j].remainingTime > 0.0f) {
+                    result.timeQuantum += readyQueue[j].burstTime;
+                    ++numOfProcesses;
+                }
+            }
+            result.timeQuantum /= numOfProcesses;
+            result.timeQuantum *= 0.85f;
+            PRINT_BLUE("QUANTUM TIME NOW: ");
+            printf("%.3f\n", result.timeQuantum);
+
+            // Process yet to be done, evaluate
+            if (readyQueue[i].remainingTime > 0.0f) {
+
+                // Find the matching process to determine if it was the first time this process was ran.
+                // If so, calculate the response time.
+                for (j = 0; j < processesSize; ++j){
+                    if (strcmp(readyQueue[i].processName, processes[j].name) == 0){
+                        if (result.processResults[j].responseTime < 0.0f) {
+                            result.processResults[j].responseTime = result.totalTime - processes[j].arrivalTime;
+                            if (result.processResults[j].responseTime < 0.0f) { result.processResults[j].responseTime = 0.0f; }
+                        }
+                    }
+                }
+
+                processExecutedFlag = 1;
+
+                // The remaining time left on process is more than the timeQuantum given...
+                if (readyQueue[i].remainingTime > result.timeQuantum) {
+                    // Execute process till time quantum is up.
+                    result.totalTime += result.timeQuantum;
+                    readyQueue[i].remainingTime -= result.timeQuantum;
+                }
+
+                // If the remaining time on the current process fits on the quantumTime,
+                // we can finish it now.
+                if (readyQueue[i].remainingTime <= result.timeQuantum) {
+                    result.totalTime += readyQueue[i].remainingTime;
+                    // Find the matching process to update the results of the finished process.
+                    for (j = 0; j < processesSize; ++j){
+                        if (strcmp(readyQueue[i].processName, processes[j].name) == 0){
+                            result.processResults[j].waitingTime = result.totalTime - processes[j].arrivalTime - processes[j].burstTime;
+                            result.processResults[j].turnaroundTime = result.processResults[j].waitingTime + processes[j].burstTime;
+                        }
+                    }
+                    readyQueue[i].remainingTime = 0;
+                }
+
+                // This process was not the same as last, context switch occured.
+                if (strcmp(lastProcess, readyQueue[i].processName) != 0) {
+                    result.contextSwitch += 1;
+                    strcpy(lastProcess, readyQueue[i].processName);
+                }
+            }
 
 
-  char lastProcess[MAX_NAME_LEN] = "";
-  while (1) {
-    int allProcessesDoneFlag = 1;
-    for (i = 0; i < processesSize; i++) {
-      result.processResults[i].responseTime = ((i  * result.timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * result.timeQuantum) - processes[i].arrivalTime) : 0;
-      // Process has yet to arrive, ignore.
-      if (processes[i].arrivalTime > result.totalTime){
-        allProcessesDoneFlag = 0;
-        continue;
-      }
+            int newProcessReadyFlag = 0;
+            // Check if any processes are waiting to be added to the ready queue.
+            for (j = 0; j < processesSize; ++j){
+                if (addedProcessFlag[j] == 1){
+                    // This process was already added to ready queue, ignore.
+                    continue;
+                }
 
-      // Process yet to be done, evaluate
-      if (remainingTime[i] > 0) {
-        allProcessesDoneFlag = 0;
-        printf("%s, %.2f ", processes[i].name, result.timeQuantum);
-        // The remaining time left on process is more than the timeQuantum given...
-        if (remainingTime[i] > result.timeQuantum) {
-          // Execute process till time quantum is up.
-          result.totalTime += result.timeQuantum;
-          remainingTime[i] -= result.timeQuantum;
+                if (processes[j].arrivalTime <= result.totalTime){
+                    newProcessReadyFlag = 1;
+                }
+            }
+
+            // New process waiting to be added, break out of loop to add them.
+            if (newProcessReadyFlag == 1){
+                break;
+            }
         }
 
-        // If the remaining time on the current process fits on the quantumTime,
-        // we can finish it now.
-        if (remainingTime[i] <= result.timeQuantum) {
-          // Execute process till end, then calculate the times for this process.
-          result.totalTime += remainingTime[i];
-          result.processResults[i].waitingTime = result.totalTime - processes[i].arrivalTime - processes[i].burstTime;
-          result.processResults[i].turnaroundTime = result.processResults[i].waitingTime + processes[i].burstTime;
-          remainingTime[i] = 0;
+        int newProcessArrivedFlag = 0;
+        int allProcessesDone = 1;
+        // Loop through and add all arrived processes to the ready queue.
+        for (j = 0; j < processesSize; ++j){
+            if (addedProcessFlag[j] == 1){
+                // This process was already added to ready queue, ignore.
+                continue;
+            }
+            allProcessesDone = 0;
+            if (processes[j].arrivalTime <= result.totalTime){
+                strcpy(readyQueue[readyQueueSize].processName, processes[j].name);
+                readyQueue[readyQueueSize].burstTime = processes[j].burstTime;
+                readyQueue[readyQueueSize].remainingTime = processes[j].burstTime;
+                ++readyQueueSize;
+
+                newProcessArrivedFlag = 1;
+                addedProcessFlag[j] = 1;
+            }
         }
 
-        // This process was not the same as last, context switch occured.
-        if (strcmp(lastProcess, processes[i].name) != 0){
-          result.contextSwitch += 1;
-          strcpy(lastProcess, processes[i].name);
+        // New process was added, sort the ready queue again.
+        if (newProcessArrivedFlag == 1){
+            qsort(readyQueue, readyQueueSize, sizeof(ReadyProcess), compare_ready_processes);
         }
-      }
+
+        // If there are no new processes that arrived, but not all processes are done,
+        // check if we need to skip time until the next arriving process.
+        else if (newProcessArrivedFlag == 0 && allProcessesDone == 0){
+            int skipTimeRequiredFlag = 1;
+            for (i = 0; i < readyQueueSize; ++i){
+                if (readyQueue[i].remainingTime > 0.0f){
+                    skipTimeRequiredFlag = 0;
+                    break;
+                }
+            }
+
+            // Need to skip time until the next arriving process
+            if (skipTimeRequiredFlag == 1){
+                // Find the next earliest arrival
+                float earliestArrival = -1.0f;
+                for (j = 0; j < processesSize; ++j){
+                    if (addedProcessFlag[j] == 1){
+                        // This process was already added to ready queue, ignore.
+                        continue;
+                    }
+
+                    if (earliestArrival < 0.0f || processes[j].arrivalTime < earliestArrival) {
+                        earliestArrival = processes[j].arrivalTime;
+                    }
+                }
+
+                // Skip time until earliest arrival.
+                result.totalTime = earliestArrival;
+            }
+        }
+
+        // All processes are done, just exit.
+        else if (allProcessesDone == 1){
+            break;
+        }
     }
 
-    // Not all processes are done yet
-    float nextArrivalTime = find_next_arrival_time(remainingTime, processes, processesSize);
-    if (nextArrivalTime != INT_MAX && result.totalTime < nextArrivalTime){
-      // The CPU now has to wait until the next process arrives, let the CPU wait.
-      result.totalTime += (nextArrivalTime - result.totalTime);
-      allProcessesDoneFlag = 0;
+    result.avgWaitingTime = 0.0f;
+    result.avgTurnaroundTime = 0.0f;
+    result.avgResponseTime = 0.0f;
+
+    for (int i = 0; i < processesSize; i++) {
+        result.avgWaitingTime += result.processResults[i].waitingTime;
+        result.avgTurnaroundTime += result.processResults[i].turnaroundTime;
+        result.avgResponseTime += result.processResults[i].responseTime;
     }
 
-    if (allProcessesDoneFlag == 1) {
-      break;
-    }
-  }
+    result.avgWaitingTime /= processesSize;
+    result.avgTurnaroundTime /= processesSize;
+    result.avgResponseTime /= processesSize;
 
-  result.avgWaitingTime = 0.0f;
-  result.avgTurnaroundTime = 0.0f;
-  result.avgResponseTime = 0.0f;
-
-  for (int i = 0; i < processesSize; i++) {
-    result.avgWaitingTime += result.processResults[i].waitingTime;
-    result.avgTurnaroundTime += result.processResults[i].turnaroundTime;
-    result.avgResponseTime += result.processResults[i].responseTime;
-  }
-
-  result.avgWaitingTime /= processesSize;
-  result.avgTurnaroundTime /= processesSize;
-  result.avgResponseTime /= processesSize;
-
-  strcpy(result.roundRobinUsed, "Eighty Five Percentile Round Robin");
-  return result;
+    free(readyQueue);
+    strcpy(result.roundRobinUsed, "Eighty Five Percentile Round Robin");
+    return result;
 }

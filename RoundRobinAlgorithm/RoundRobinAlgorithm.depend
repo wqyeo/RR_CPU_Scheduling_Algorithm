@@ -199,7 +199,7 @@
 	"Util/color_print.h"
 	"Util/data_saver.h"
 
-1678199465 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/EFPRR.h
+1678216564 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/EFPRR.h
 	"../Models/process.h"
 
 1678197293 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/sorted_round_robin.h
@@ -207,7 +207,7 @@
 
 1677319672 /media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/Util/data_saver.h
 
-1678212381 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/EFPRR.c
+1678217121 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/EFPRR.c
 	<stdio.h>
 	<stdlib.h>
 	<math.h>
@@ -216,6 +216,8 @@
 	"../Models/process.h"
 	"../Models/process_result.h"
 	"../Models/round_robin_result.h"
+	"../Util/color_print.h"
+	"EFPRR.h"
 	"round_robin.h"
 
 1678212729 source:/media/wqyeo/PopHD/GITLOCAL/RR_CPU_Scheduling_Algorithm/RoundRobinAlgorithm/RoundRobin/sorted_round_robin.c
