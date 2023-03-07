@@ -34,6 +34,10 @@
 		<Unit filename="Models/process.h" />
 		<Unit filename="Models/process_result.h" />
 		<Unit filename="Models/round_robin_result.h" />
+		<Unit filename="RoundRobin/EFPRR.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="RoundRobin/EFPRR.h" />
 		<Unit filename="RoundRobin/best_quantum_time_round_robin.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -46,13 +50,29 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="RoundRobin/round_robin.h" />
+		<Unit filename="RoundRobin/sorted_round_robin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="RoundRobin/sorted_round_robin.h" />
+		<Unit filename="Util/color_print.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Util/color_print.h" />
+		<Unit filename="Util/data_saver.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Util/data_saver.h" />
+		<Unit filename="console_application.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="console_application.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="util.c">
+		<Unit filename="process_generator.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="util.h" />
+		<Unit filename="process_generator.h" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

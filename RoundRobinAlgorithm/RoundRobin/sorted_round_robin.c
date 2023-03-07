@@ -4,6 +4,7 @@
 #include <math.h>
 #include <string.h>
 #include <limits.h>
+#include <float.h>
 
 #include "../Models/process.h"
 #include "../Models/process_result.h"
@@ -55,7 +56,7 @@ RoundRobinResult sorted_round_robin(Process *processes, int processesSize, char*
 
       // Process yet to be done, evaluate
       if (remainingTime[i] > 0) {
-        printf("Process name %s,%.2f",processes[i].name,result.totalTime);
+        printf("Process name %s, %.2f\n",processes[i].name,result.totalTime);
         allProcessesDoneFlag = 0;
 
         // The remaining time left on process is more than the timeQuantum given...
@@ -63,8 +64,7 @@ RoundRobinResult sorted_round_robin(Process *processes, int processesSize, char*
           // Execute process till time quantum is up.
           result.totalTime += result.timeQuantum;
           remainingTime[i] -= result.timeQuantum;
-        }
-        else if (remainingTime[i] <= result.timeQuantum) {
+        } else if (remainingTime[i] <= result.timeQuantum) {
           // Execute process till end, then calculate the times for this process.
           result.totalTime += remainingTime[i];
           result.processResults[i].waitingTime = result.totalTime - processes[i].arrivalTime - processes[i].burstTime;
@@ -82,7 +82,7 @@ RoundRobinResult sorted_round_robin(Process *processes, int processesSize, char*
 
     // Not all processes are done yet
     float nextArrivalTime = find_next_arrival_time(remainingTime, processes, processesSize);
-    if (nextArrivalTime != INT_MAX && result.totalTime < nextArrivalTime){
+    if (nextArrivalTime != FLT_MAX && result.totalTime < nextArrivalTime){
       // The CPU now has to wait until the next process arrives, let the CPU wait.
       result.totalTime += (nextArrivalTime - result.totalTime);
       allProcessesDoneFlag = 0;
@@ -107,6 +107,6 @@ RoundRobinResult sorted_round_robin(Process *processes, int processesSize, char*
   result.avgTurnaroundTime /= processesSize;
   result.avgResponseTime /= processesSize;
 
-  strcpy(result.roundRobinUsed, "Best Quantum Time Round Robin");
+  strcpy(result.roundRobinUsed, "Sorted Round Robin");
   return result;
 }

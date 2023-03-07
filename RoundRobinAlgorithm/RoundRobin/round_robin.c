@@ -36,7 +36,8 @@ float get_median_burst_times(Process *processes, int processesSize) {
 
 float get_lowest_arrival_time(Process *processes, int processesSize) {
   float lowestArrivalTime = FLT_MAX;
-  for (int i = 0; i < processesSize; i++) {
+  int i;
+  for (i = 0; i < processesSize; i++) {
     if (processes[i].arrivalTime < lowestArrivalTime) {
       lowestArrivalTime = processes[i].arrivalTime;
     }

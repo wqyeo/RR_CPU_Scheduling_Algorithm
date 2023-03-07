@@ -131,7 +131,7 @@ Process *request_processes(int size) {
 
 _RoundRobinArray request_round_robin_mode(){
   char inputStr[MAX_USER_INPUT_SIZE];
-  RoundRobinMode* modeArray = malloc(3 * sizeof(RoundRobinMode));;
+  RoundRobinMode* modeArray = malloc(5 * sizeof(RoundRobinMode));;
 
   while (1) {
     PRINT_WHITE("\nSelect Mode:\n");
@@ -140,7 +140,8 @@ _RoundRobinArray request_round_robin_mode(){
     PRINT_GRAY("3 - Manhatten Round Robin\n");
     PRINT_GRAY("4 - Best Quantum Time Round Robin\n");
     PRINT_GRAY("5 - Eighty Five Percentile Round Robin\n");
-    PRINT_WHITE("(1/2/3/4/5):\n");
+    PRINT_GRAY("6 - Sorted Round Robin\n");
+    PRINT_WHITE("(1-6):\n");
     fgets(inputStr, MAX_USER_INPUT_SIZE, stdin);
     // Remove the 'enter' key
     inputStr[strcspn(inputStr, "\n")] = '\0';
@@ -154,6 +155,7 @@ _RoundRobinArray request_round_robin_mode(){
       modeArray[1] = MANHATTEN_ROUND_ROBIN;
       modeArray[2] = BEST_QUANTUM_TIME_ROUND_ROBIN;
       modeArray[3] = EIGHT_FIVE_PERCENTILE_ROUND_ROBIN;
+      modeArray[4] = SORTED_ROUND_ROBIN;
 
       return (_RoundRobinArray){.modes = modeArray, .size = 3};
     } else if (strcmp(inputStr, "2") == 0) {
@@ -171,9 +173,8 @@ _RoundRobinArray request_round_robin_mode(){
     }  else if (strcmp(inputStr, "6") == 0) {
       modeArray[0] = SORTED_ROUND_ROBIN;
       return (_RoundRobinArray){.modes = modeArray, .size = 1};
-    }
-     else {
-      PRINT_YELLOW("Invalid input. Please enter 1, 2, 3, 4.\n");
+    } else {
+      PRINT_YELLOW("Invalid input. Please enter 1-6.\n");
     }
   }
   // Shouldn't reach here.
@@ -225,13 +226,15 @@ void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExte
 
   _RoundRobinArray roundRobinsToUse;
   if (runMode == GENERATOR) {
-    RoundRobinMode* roundRobinModes = malloc(3 * sizeof(RoundRobinMode));
+    RoundRobinMode* roundRobinModes = malloc(5 * sizeof(RoundRobinMode));
     roundRobinModes[0] = ROUND_ROBIN;
     roundRobinModes[1] = MANHATTEN_ROUND_ROBIN;
     roundRobinModes[2] = BEST_QUANTUM_TIME_ROUND_ROBIN;
+    roundRobinModes[3] = SORTED_ROUND_ROBIN;
+    roundRobinModes[4] = EIGHT_FIVE_PERCENTILE_ROUND_ROBIN;
 
     roundRobinsToUse.modes = roundRobinModes;
-    roundRobinsToUse.size = 3;
+    roundRobinsToUse.size = 5;
   } else {
     roundRobinsToUse = request_round_robin_mode();
   }

@@ -25,57 +25,6 @@ float calc_active_burst_average(Process *processes, float *remainingTime, int pr
     return sumOfProcessesBurst / numOfRemaining;
 }
 
-void merge(Process* arr, int left, int mid, int right) {
-  int i, j, k;
-  int n1 = mid - left + 1;
-  int n2 = right - mid;
-
-  Process L[n1], R[n2];
-
-  for (i = 0; i < n1; i++)
-    L[i] = arr[left + i];
-  for (j = 0; j < n2; j++)
-    R[j] = arr[mid + 1 + j];
-
-  i = 0;
-  j = 0;
-  k = left;
-
-  while (i < n1 && j < n2) {
-    if (L[i].arrivalTime < R[j].arrivalTime) {
-      arr[k] = L[i];
-      i++;
-    } else if (L[i].arrivalTime == R[j].arrivalTime && L[i].burstTime < R[j].burstTime) {
-      arr[k] = L[i];
-      i++;
-    } else {
-      arr[k] = R[j];
-      j++;
-    }
-    k++;
-  }
-
-  while (i < n1) {
-    arr[k] = L[i];
-    i++;
-    k++;
-  }
-
-  while (j < n2) {
-    arr[k] = R[j];
-    j++;
-    k++;
-  }
-}
-
-void mergeSort(Process* arr, int left, int right) {
-  if (left < right) {
-    int mid = left + (right - left) / 2;
-    mergeSort(arr, left, mid);
-    mergeSort(arr, mid + 1, right);
-    merge(arr, left, mid, right);
-  }
-}
 
 RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping) {
   RoundRobinResult result;
@@ -91,6 +40,8 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping) {
 
   // Sort from shortest to longest burst time.
   qsort(processes, processesSize, sizeof(Process), compare_processes);
+    Process* readyQueue = (Process*) malloc(sizeof(Process) * processesSize);
+    int readyQueueSize = 0;
 
   // init
   for (i = 0; i < processesSize; i++) {
@@ -99,17 +50,17 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping) {
     result.processResults[i].turnaroundTime = 0.0f;
     result.processResults[i].responseTime = 0.0f;
     result.processResults[i].process = processes[i];
-  }
 
-  // TimeQuantum is now calculated as such:
-  float mean = get_mean_burst_times(processes, processesSize);
-  float median = get_median_burst_times(processes, processesSize);
+    if (processes[i].arrivalTime <= result.totalTime){
+        readyQueue[readyQueueSize] = processes[i];
+        ++readyQueueSize;
+    }
+  }
+    result.timeQuantum = calc_active_burst_average(processes, remainingTime, processesSize, result.totalTime) * 0.85f;
+
 
   char lastProcess[MAX_NAME_LEN] = "";
-  // Same as simulating basic Round Robin here, except with a few changes due to the modified algorithm...
-  mergeSort(processes, 0, processesSize - 1);
   while (1) {
-    result.timeQuantum = calc_active_burst_average(processes, remainingTime, processesSize, result.totalTime) * 0.85f;
     int allProcessesDoneFlag = 1;
     for (i = 0; i < processesSize; i++) {
       result.processResults[i].responseTime = ((i  * result.timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * result.timeQuantum) - processes[i].arrivalTime) : 0;
@@ -132,7 +83,6 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping) {
 
         // If the remaining time on the current process fits on the quantumTime,
         // we can finish it now.
-        // (Modified round robin ensures that this check occurs after executing the process.)
         if (remainingTime[i] <= result.timeQuantum) {
           // Execute process till end, then calculate the times for this process.
           result.totalTime += remainingTime[i];

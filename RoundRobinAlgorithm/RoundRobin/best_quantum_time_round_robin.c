@@ -1,9 +1,10 @@
-// CPU Scheduling Method : BEST TIME QUANTUM ROUND ROBIN CPU SCHEDULING ALGORITHM
+// CPU Scheduling Mehod : BEST TIME QUANTUM ROUND ROBIN CPU SCHEDULING ALGORITHM
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
 #include <limits.h>
+#include <float.h>
 
 #include "../Models/process.h"
 #include "../Models/process_result.h"
@@ -85,7 +86,7 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize, cha
 
     // Not all processes are done yet
     float nextArrivalTime = find_next_arrival_time(remainingTime, processes, processesSize);
-    if (nextArrivalTime != INT_MAX && result.totalTime < nextArrivalTime){
+    if (nextArrivalTime != FLT_MAX && result.totalTime < nextArrivalTime){
       // The CPU now has to wait until the next process arrives, let the CPU wait.
       result.totalTime += (nextArrivalTime - result.totalTime);
       allProcessesDoneFlag = 0;
