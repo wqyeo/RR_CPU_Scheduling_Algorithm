@@ -13,6 +13,7 @@
 #include "RoundRobin/round_robin.h"
 #include "RoundRobin/manhatten_round_robin.h"
 #include "RoundRobin/best_quantum_time_round_robin.h"
+#include "RoundRobin/EFPRR.h"
 #include "RoundRobin/sorted_round_robin.h"
 
 #include "Util/color_print.h"
@@ -138,7 +139,8 @@ _RoundRobinArray request_round_robin_mode(){
     PRINT_GRAY("2 - Round Robin\n");
     PRINT_GRAY("3 - Manhatten Round Robin\n");
     PRINT_GRAY("4 - Best Quantum Time Round Robin\n");
-    PRINT_WHITE("(1/2/3/4):\n");
+    PRINT_GRAY("5 - Eighty Five Percentile Round Robin\n");
+    PRINT_WHITE("(1/2/3/4/5):\n");
     fgets(inputStr, MAX_USER_INPUT_SIZE, stdin);
     // Remove the 'enter' key
     inputStr[strcspn(inputStr, "\n")] = '\0';
@@ -151,6 +153,7 @@ _RoundRobinArray request_round_robin_mode(){
       modeArray[0] = ROUND_ROBIN;
       modeArray[1] = MANHATTEN_ROUND_ROBIN;
       modeArray[2] = BEST_QUANTUM_TIME_ROUND_ROBIN;
+      modeArray[3] = EIGHT_FIVE_PERCENTILE_ROUND_ROBIN;
 
       return (_RoundRobinArray){.modes = modeArray, .size = 3};
     } else if (strcmp(inputStr, "2") == 0) {
@@ -162,8 +165,10 @@ _RoundRobinArray request_round_robin_mode(){
     } else if (strcmp(inputStr, "4") == 0) {
       modeArray[0] = BEST_QUANTUM_TIME_ROUND_ROBIN;
       return (_RoundRobinArray){.modes = modeArray, .size = 1};
-    }
-    else if (strcmp(inputStr, "6") == 0) {
+    } else if (strcmp(inputStr, "5") == 0) {
+      modeArray[0] = EIGHT_FIVE_PERCENTILE_ROUND_ROBIN;
+      return (_RoundRobinArray){.modes = modeArray, .size = 1};
+    }  else if (strcmp(inputStr, "6") == 0) {
       modeArray[0] = SORTED_ROUND_ROBIN;
       return (_RoundRobinArray){.modes = modeArray, .size = 1};
     }
@@ -250,12 +255,13 @@ void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExte
       } else if (roundRobinsToUse.modes[i] == BEST_QUANTUM_TIME_ROUND_ROBIN){
         strcpy(fileName,"BestTimeQuantum_");
         roundRobinResult = modified_round_robin(clonedProcesses, processCount, groupingString);
-      }
-      else if (roundRobinsToUse.modes[i] == SORTED_ROUND_ROBIN){
+      } else if (roundRobinsToUse.modes[i] == SORTED_ROUND_ROBIN){
         strcpy(fileName,"SortedRoundRobin_");
         roundRobinResult = sorted_round_robin(clonedProcesses, processCount, groupingString);
-      }
-       else {
+      } else if (roundRobinsToUse.modes[i] == EIGHT_FIVE_PERCENTILE_ROUND_ROBIN){
+        strcpy(fileName,"EFPRR_");
+        roundRobinResult = EFPRR(clonedProcesses, processCount, groupingString);
+      } else {
         PRINT_RED("Unimplemented Round Robin mode called");
         simulatedFlag = 0;
         continue;
