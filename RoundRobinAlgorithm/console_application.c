@@ -13,6 +13,7 @@
 #include "RoundRobin/round_robin.h"
 #include "RoundRobin/manhatten_round_robin.h"
 #include "RoundRobin/best_quantum_time_round_robin.h"
+#include "RoundRobin/sorted_round_robin.h"
 
 #include "Util/color_print.h"
 #include "Util/data_saver.h"
@@ -161,7 +162,12 @@ _RoundRobinArray request_round_robin_mode(){
     } else if (strcmp(inputStr, "4") == 0) {
       modeArray[0] = BEST_QUANTUM_TIME_ROUND_ROBIN;
       return (_RoundRobinArray){.modes = modeArray, .size = 1};
-    } else {
+    }
+    else if (strcmp(inputStr, "6") == 0) {
+      modeArray[0] = SORTED_ROUND_ROBIN;
+      return (_RoundRobinArray){.modes = modeArray, .size = 1};
+    }
+     else {
       PRINT_YELLOW("Invalid input. Please enter 1, 2, 3, 4.\n");
     }
   }
@@ -244,7 +250,12 @@ void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExte
       } else if (roundRobinsToUse.modes[i] == BEST_QUANTUM_TIME_ROUND_ROBIN){
         strcpy(fileName,"BestTimeQuantum_");
         roundRobinResult = modified_round_robin(clonedProcesses, processCount, groupingString);
-      } else {
+      }
+      else if (roundRobinsToUse.modes[i] == SORTED_ROUND_ROBIN){
+        strcpy(fileName,"SortedRoundRobin_");
+        roundRobinResult = sorted_round_robin(clonedProcesses, processCount, groupingString);
+      }
+       else {
         PRINT_RED("Unimplemented Round Robin mode called");
         simulatedFlag = 0;
         continue;

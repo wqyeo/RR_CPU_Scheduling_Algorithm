@@ -20,7 +20,8 @@ typedef enum {
 typedef enum {
     ROUND_ROBIN,
     MANHATTEN_ROUND_ROBIN,
-    BEST_QUANTUM_TIME_ROUND_ROBIN
+    BEST_QUANTUM_TIME_ROUND_ROBIN,
+    SORTED_ROUND_ROBIN
 } RoundRobinMode;
 
 typedef struct {
