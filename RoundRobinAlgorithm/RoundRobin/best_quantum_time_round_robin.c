@@ -41,11 +41,13 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize, cha
   float median = get_median_burst_times(processes, processesSize);
   result.timeQuantum = (mean + median) / 2.0f;
 
+  // Used to keep track of context switches.
   char lastProcess[MAX_NAME_LEN] = "";
   // Same as simulating basic Round Robin here, except with a few changes due to the modified algorithm...
   while (1) {
     int allProcessesDoneFlag = 1;
     for (i = 0; i < processesSize; i++) {
+      // Calculate response time, but ensure response time is never negative.
       result.processResults[i].responseTime = ((i  * result.timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * result.timeQuantum) - processes[i].arrivalTime) : 0;
 
       // Process has yet to arrive, ignore.

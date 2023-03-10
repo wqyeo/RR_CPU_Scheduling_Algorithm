@@ -23,6 +23,10 @@ def determine_rr_type_from_str(rr_type_str: str) -> RoundRobinType:
         return RoundRobinType.BEST_QUANTUM_TIME
     elif rr_type_str == "Round Robin Manhattan Distance":
         return RoundRobinType.MANHATTAN
+    elif rr_type_str == "Eighty Five Percentile Round Robin":
+        return RoundRobinType.EIGHTY_FIVE_PERCENT
+    elif rr_type_str == "Sorted Round Robin":
+        return RoundRobinType.SORTED
     return RoundRobinType.ROUND_ROBIN
 
 def update_curr_process_with_line(line: str, process_data: ProcessData, index_counter: int) -> None:

@@ -27,6 +27,8 @@ RoundRobinResult manhattan_round_robin(Process *processes, int processesSize, ch
         quantumTime = processes[0].burstTime;
     }
 
+    // Manhattan round robin has the same exact algorithm as a normal round robin,
+    // the difference is the quantum time used.
     RoundRobinResult result = round_robin(processes, processesSize, quantumTime, grouping);
     strcpy(result.roundRobinUsed, "Round Robin Manhattan Distance");
     return result;

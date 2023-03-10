@@ -25,7 +25,6 @@
 char *generate_random_string(int length) {
   static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   char *random_string = malloc(sizeof(char) * (length + 1));
-  srand(time(NULL));
 
   for (int i = 0; i < length; i++) {
     int index = rand() % (int)(sizeof(charset) - 1);
@@ -317,6 +316,7 @@ void repeat_do_test(int repeatCount) {
 }
 
 void run_application() {
+  srand(time(NULL));
   PRINT_WHITE("Round Robin Simulator...\n");
   char inputStr[MAX_USER_INPUT_SIZE];
 
@@ -347,7 +347,7 @@ void run_application() {
     } else if (strcmp(inputStr, "exit") == 0) {
       break;
     } else {
-      PRINT_YELLOW("Invalid input. Please enter 1, 2 or exit.\n");
+      PRINT_YELLOW("Invalid input. Please enter 1, 2, 3 or exit.\n");
     }
   }
 }

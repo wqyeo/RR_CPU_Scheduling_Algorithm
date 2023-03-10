@@ -8,7 +8,7 @@ typedef struct {
   char roundRobinUsed[256];
 
   // Use this during analysis;
-  // group datasets together, marking them as the same test case.
+  // group datasets together, marking them as having received the same test case inputs.
   char grouping[64];
 
   ProcessResult *processResults;

@@ -12,6 +12,10 @@ def get_plot_color_by_rr_type(rr_type: RoundRobinType) -> str:
         return "r"
     if rr_type == RoundRobinType.ROUND_ROBIN:
         return "g"
+    if rr_type == RoundRobinType.SORTED:
+        return "k"
+    if rr_type == RoundRobinType.EIGHTY_FIVE_PERCENT:
+        return "m"
     return "c"
 
 def get_legend_name_by_rr_type(rr_type: RoundRobinType) -> str:
@@ -19,6 +23,10 @@ def get_legend_name_by_rr_type(rr_type: RoundRobinType) -> str:
         return "Best Quantum Time"
     if rr_type == RoundRobinType.MANHATTAN:
         return "Manhattan Distance"
+    if rr_type == RoundRobinType.SORTED:
+        return "Sorted"
+    if rr_type == RoundRobinType.EIGHTY_FIVE_PERCENT:
+        return "Eighty Five Percent"
     return "Standard Round Robin"
 
 def plot_graph_analysis(analysis_groupings: dict[str, AnalysisGroup], graph_file_name: str) -> None:
@@ -42,6 +50,7 @@ def plot_graph_analysis(analysis_groupings: dict[str, AnalysisGroup], graph_file
     # Able to set title, size and what to plot.
     plt.figure(figsize=(10, 6))
     legends: list[str] = []
+
     for key, value in colored_line_plots.items():
         plt.plot(value.get_x_plots(), value.get_y_plots(), value.color)
         legends.append(value.legend)
