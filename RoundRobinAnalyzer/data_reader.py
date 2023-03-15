@@ -51,18 +51,16 @@ def update_main_data_with_line(line: str, analysis_data: AnalysisData, index_cou
     elif index_counter == 1:
         analysis_data.grouping = line.split('=')[1].strip()
     elif index_counter == 2:
-        analysis_data.quantum_time = float(line.split('=')[1].strip())
-    elif index_counter == 3:
         analysis_data.average_waiting_time = float(line.split('=')[1].strip())
-    elif index_counter == 4:
+    elif index_counter == 3:
         analysis_data.average_turnaround_time = float(line.split('=')[1].strip())
-    elif index_counter == 5:
+    elif index_counter == 4:
         analysis_data.average_response_time = float(line.split('=')[1].strip())
-    elif index_counter == 6:
+    elif index_counter == 5:
         analysis_data.total_time_taken = float(line.split('=')[1].strip())
-    elif index_counter == 7:
+    elif index_counter == 6:
         analysis_data.context_switch_count = int(line.split('=')[1].strip())
-    elif index_counter == 8:
+    elif index_counter == 7:
         # Total number of processes
         pass
 

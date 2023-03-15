@@ -36,17 +36,18 @@ RoundRobinResult sorted_round_robin(Process *processes, int processesSize, char*
     result.processResults[i].process = processes[i];
   }
 
-  // TimeQuantum is now calculated as such:
-  float mean = get_mean_burst_times(processes, processesSize);
-  float median = get_median_burst_times(processes, processesSize);
-  result.timeQuantum = mean;
+  // TimeQuantum is calculated as by getting the mean of all burst times.
+  float timeQuantum = get_mean_burst_times(processes, processesSize);
+
+  result.timeQuantumUsed = 1;
+  result.timeQuantums[0] = timeQuantum;
 
   char lastProcess[MAX_NAME_LEN] = "";
   // Same as simulating basic Round Robin here, except with a few changes due to the modified algorithm...
   while (1) {
     int allProcessesDoneFlag = 1;
     for (i = 0; i < processesSize; i++) {
-      result.processResults[i].responseTime = ((i  * result.timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * result.timeQuantum) - processes[i].arrivalTime) : 0;
+      result.processResults[i].responseTime = ((i  * timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * timeQuantum) - processes[i].arrivalTime) : 0;
 
       // Process has yet to arrive, ignore.
       if (processes[i].arrivalTime > result.totalTime){
@@ -60,11 +61,11 @@ RoundRobinResult sorted_round_robin(Process *processes, int processesSize, char*
         allProcessesDoneFlag = 0;
 
         // The remaining time left on process is more than the timeQuantum given...
-        if (remainingTime[i] > result.timeQuantum) {
+        if (remainingTime[i] > timeQuantum) {
           // Execute process till time quantum is up.
-          result.totalTime += result.timeQuantum;
-          remainingTime[i] -= result.timeQuantum;
-        } else if (remainingTime[i] <= result.timeQuantum) {
+          result.totalTime += timeQuantum;
+          remainingTime[i] -= timeQuantum;
+        } else if (remainingTime[i] <= timeQuantum) {
           // Execute process till end, then calculate the times for this process.
           result.totalTime += remainingTime[i];
           result.processResults[i].waitingTime = result.totalTime - processes[i].arrivalTime - processes[i].burstTime;

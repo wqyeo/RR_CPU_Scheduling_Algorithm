@@ -8,26 +8,30 @@
 #include "round_robin.h"
 
 RoundRobinResult manhattan_round_robin(Process *processes, int processesSize, char* grouping){
-    float max = FLT_MIN;
-    float min = FLT_MAX;
-
     int i;
+
+    float maxBurstTime = FLT_MIN;
+    float minBurstTime = FLT_MAX;
+    // Find the max and min burst time from the processes.
     for (i = 0; i < processesSize; i++) {
-        if (processes[i].burstTime > max) {
-            max = processes[i].burstTime;
+        if (processes[i].burstTime > maxBurstTime) {
+            maxBurstTime = processes[i].burstTime;
         }
-        if (processes[i].burstTime < min) {
-            min = processes[i].burstTime;
+        if (processes[i].burstTime < minBurstTime) {
+            minBurstTime = processes[i].burstTime;
         }
     }
 
-    float quantumTime = max - min;
+    // Quantum time is max burst time - min burst time.
+    float quantumTime = maxBurstTime - minBurstTime;
+
+    // If all processes burst time is the same,
+    // just set time quantum to the burst time.
     if (quantumTime == 0){
-        // All process burst time is the same.
         quantumTime = processes[0].burstTime;
     }
 
-    // Manhattan round robin has the same exact algorithm as a normal round robin,
+    // Manhattan round robin has the same exact algorithm as a traditional round robin,
     // the difference is the quantum time used.
     RoundRobinResult result = round_robin(processes, processesSize, quantumTime, grouping);
     strcpy(result.roundRobinUsed, "Round Robin Manhattan Distance");

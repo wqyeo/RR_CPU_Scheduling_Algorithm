@@ -54,7 +54,17 @@ char* get_current_datetime_string() {
 void print_round_robin_result(RoundRobinResult result){
   int i;
   printf("\nCPU Scheduling Algorithm (%s)\n", result.roundRobinUsed);
-  printf("\nTime Quantum: %.2f", result.timeQuantum);
+
+  printf("\nTime Quantum Used: %d", result.timeQuantumUsed);
+  printf("\nTime Quantums:[");
+  for (i = 0; i < result.timeQuantumUsed; ++i){
+    printf("%.2f", result.timeQuantums[i]);
+    // Apply comma if not ending, so it prints like [1, 3]
+    if (i + 1 < result.timeQuantumUsed){
+        printf(", ");
+    }
+  }
+  printf("]");
 
   // Print out a table of the times for each of the process.
   printf("\nPROCESS\tBURST TIME\tWAITING TIME\tTURNAROUND TIME\tRESPONSE TIME\n");
@@ -137,7 +147,7 @@ _RoundRobinArray request_round_robin_mode(){
     PRINT_GRAY("1 - All (Run all implemented round robin tests) \n");
     PRINT_GRAY("2 - Round Robin\n");
     PRINT_GRAY("3 - Manhatten Round Robin\n");
-    PRINT_GRAY("4 - Best Quantum Time Round Robin\n");
+    PRINT_GRAY("4 - Best Time Quantum Round Robin\n");
     PRINT_GRAY("5 - Eighty Five Percentile Round Robin\n");
     PRINT_GRAY("6 - Sorted Round Robin\n");
     PRINT_WHITE("(1-6):\n");

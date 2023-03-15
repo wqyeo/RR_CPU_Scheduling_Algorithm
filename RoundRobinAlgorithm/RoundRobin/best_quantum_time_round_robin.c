@@ -39,7 +39,11 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize, cha
   // TimeQuantum is now calculated as such:
   float mean = get_mean_burst_times(processes, processesSize);
   float median = get_median_burst_times(processes, processesSize);
-  result.timeQuantum = (mean + median) / 2.0f;
+
+  float timeQuantum = (mean + median) / 2.0f;
+
+  result.timeQuantumUsed = 1;
+  result.timeQuantums[0] = timeQuantum;
 
   // Used to keep track of context switches.
   char lastProcess[MAX_NAME_LEN] = "";
@@ -48,7 +52,7 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize, cha
     int allProcessesDoneFlag = 1;
     for (i = 0; i < processesSize; i++) {
       // Calculate response time, but ensure response time is never negative.
-      result.processResults[i].responseTime = ((i  * result.timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * result.timeQuantum) - processes[i].arrivalTime) : 0;
+      result.processResults[i].responseTime = ((i  * timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * timeQuantum) - processes[i].arrivalTime) : 0;
 
       // Process has yet to arrive, ignore.
       if (processes[i].arrivalTime > result.totalTime){
@@ -61,16 +65,16 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize, cha
         allProcessesDoneFlag = 0;
 
         // The remaining time left on process is more than the timeQuantum given...
-        if (remainingTime[i] > result.timeQuantum) {
+        if (remainingTime[i] > timeQuantum) {
           // Execute process till time quantum is up.
-          result.totalTime += result.timeQuantum;
-          remainingTime[i] -= result.timeQuantum;
+          result.totalTime += timeQuantum;
+          remainingTime[i] -= timeQuantum;
         }
 
         // If the remaining time on the current process fits on the quantumTime,
         // we can finish it now.
         // (Modified round robin ensures that this check occurs after executing the process.)
-        if (remainingTime[i] <= result.timeQuantum) {
+        if (remainingTime[i] <= timeQuantum) {
           // Execute process till end, then calculate the times for this process.
           result.totalTime += remainingTime[i];
           result.processResults[i].waitingTime = result.totalTime - processes[i].arrivalTime - processes[i].burstTime;
@@ -113,6 +117,6 @@ RoundRobinResult modified_round_robin(Process *processes, int processesSize, cha
   result.avgTurnaroundTime /= processesSize;
   result.avgResponseTime /= processesSize;
 
-  strcpy(result.roundRobinUsed, "Best Quantum Time Round Robin");
+  strcpy(result.roundRobinUsed, "Best Time Quantum Round Robin");
   return result;
 }

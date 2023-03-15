@@ -79,7 +79,9 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
   // We start the lowest arrival time, simulate idling until a process arrives.
   result.totalTime = get_lowest_arrival_time(processes, processesSize);
   result.contextSwitch = 0;
-  result.timeQuantum = timeQuantum;
+
+  result.timeQuantumUsed = 1;
+  result.timeQuantums[0] = timeQuantum;
 
   // init
   for (i = 0; i < processesSize; i++) {

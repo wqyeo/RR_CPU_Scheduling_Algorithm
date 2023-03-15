@@ -22,6 +22,12 @@ int compare_ready_processes(const void *a, const void *b)
 }
 
 
+// https://stackoverflow.com/questions/5989191/compare-two-floats
+// Because floats are not precise.
+int areEqual(float a, float b, float epsilon) {
+    return fabs(a - b) < epsilon;
+}
+
 RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
 {
     RoundRobinResult result;
@@ -64,27 +70,35 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
     qsort(readyQueue, readyQueueSize, sizeof(ReadyProcess), compare_ready_processes);
 
     char lastProcess[MAX_NAME_LEN] = "";
+
+    float currentTimeQuantum = 0.0f;
+    result.timeQuantumUsed = 0;
     while (1) {
         int processExecutedFlag = 0;
         for (i = 0; i < readyQueueSize; i++) {
 
             // Calculate time quantum by (Average Burst Time / Number of processes) * 0.85f;
-            result.timeQuantum = 0.0f;
+            float newTimeQuantum = 0.0f;
             int numOfProcesses = 0;
             for (j = 0; j < readyQueueSize; ++j){
                 if (readyQueue[j].remainingTime > 0.0f) {
-                    result.timeQuantum += readyQueue[j].burstTime;
+                    newTimeQuantum += readyQueue[j].burstTime;
                     ++numOfProcesses;
                 }
             }
-            result.timeQuantum /= numOfProcesses;
-            result.timeQuantum *= 0.85f;
-            PRINT_BLUE("QUANTUM TIME NOW: ");
-            printf("%.3f\n", result.timeQuantum);
+            newTimeQuantum /= numOfProcesses;
+            newTimeQuantum *= 0.85f;
+
+            // Time quantum changed, record it down.
+            if (areEqual(currentTimeQuantum, newTimeQuantum, 0.0001) == 0){
+                result.timeQuantums[result.timeQuantumUsed] = newTimeQuantum;
+                result.timeQuantumUsed += 1;
+
+                currentTimeQuantum = newTimeQuantum;
+            }
 
             // Process yet to be done, evaluate
             if (readyQueue[i].remainingTime > 0.0f) {
-
                 // Find the matching process to determine if it was the first time this process was ran.
                 // If so, calculate the response time.
                 for (j = 0; j < processesSize; ++j){
@@ -99,15 +113,15 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
                 processExecutedFlag = 1;
 
                 // The remaining time left on process is more than the timeQuantum given...
-                if (readyQueue[i].remainingTime > result.timeQuantum) {
+                if (readyQueue[i].remainingTime > currentTimeQuantum) {
                     // Execute process till time quantum is up.
-                    result.totalTime += result.timeQuantum;
-                    readyQueue[i].remainingTime -= result.timeQuantum;
+                    result.totalTime += currentTimeQuantum;
+                    readyQueue[i].remainingTime -= currentTimeQuantum;
                 }
 
                 // If the remaining time on the current process fits on the quantumTime,
                 // we can finish it now.
-                if (readyQueue[i].remainingTime <= result.timeQuantum) {
+                if (readyQueue[i].remainingTime <= currentTimeQuantum) {
                     result.totalTime += readyQueue[i].remainingTime;
                     // Find the matching process to update the results of the finished process.
                     for (j = 0; j < processesSize; ++j){
