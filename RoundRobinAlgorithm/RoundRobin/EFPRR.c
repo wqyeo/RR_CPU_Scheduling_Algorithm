@@ -13,6 +13,7 @@
 #include "EFPRR.h"
 #include "round_robin.h"
 
+// Used to sort processes in the ready queue by burst time.
 int compare_ready_processes(const void *a, const void *b)
 {
     ReadyProcess *p1 = (ReadyProcess *)a;
@@ -149,6 +150,8 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
                     continue;
                 }
 
+                // A process has just arrived,
+                // signal to add a process to the ready queue.
                 if (processes[j].arrivalTime <= result.totalTime){
                     newProcessReadyFlag = 1;
                 }
@@ -169,6 +172,9 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
                 continue;
             }
             allProcessesDone = 0;
+
+            // This process has arrive, add to  the ready queue.
+            // Set signal to sort the queue later.
             if (processes[j].arrivalTime <= result.totalTime){
                 strcpy(readyQueue[readyQueueSize].processName, processes[j].name);
                 readyQueue[readyQueueSize].burstTime = processes[j].burstTime;

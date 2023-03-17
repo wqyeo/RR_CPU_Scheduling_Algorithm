@@ -54,3 +54,7 @@ RoundRobinAlgorithm/bin/Debug/RoundRobinAlgorithm
 RoundRobinAlgorithm/program
 *.dat
 *.pyc
+
+*.depend
+
+*.layout

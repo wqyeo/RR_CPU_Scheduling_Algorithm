@@ -8,6 +8,9 @@
 #include "../Models/process_result.h"
 #include "../Models/round_robin_result.h"
 
+/**
+* Used for sorting processes by lowest burst time to highest.
+*/
 int compare_processes(const void *a, const void *b) {
   Process *p1 = (Process *)a;
   Process *p2 = (Process *)b;
@@ -67,10 +70,12 @@ float find_next_arrival_time(float* remainingTime,Process* processes, int proces
   return lowestArrivalTime;
 }
 
+/**
+* @param grouping This is used to group same tests cases together; For analysis scripts.
+*/
 RoundRobinResult round_robin(Process *processes, int processesSize, float timeQuantum, char* grouping) {
   int i;
   float remainingTime[processesSize];
-
   RoundRobinResult result;
   strcpy(result.grouping, grouping);
   result.processResults = (ProcessResult*) malloc(processesSize * sizeof(ProcessResult));
@@ -92,16 +97,18 @@ RoundRobinResult round_robin(Process *processes, int processesSize, float timeQu
     result.processResults[i].process = processes[i];
   }
 
+  // Used to determine context switch (if last process executed is not the same name as the current)
   char lastProcess[MAX_NAME_LEN] = "";
 
   // This loop simulates the Round Robin on all of the processes.
+  // Exits when all processes are done.
   while (1) {
     int allProcessesDoneFlag = 1;
     for (i = 0; i < processesSize; i++) {
       // Ensure the response time for this process is never negative.
       result.processResults[i].responseTime = ((i  * timeQuantum) - processes[i].arrivalTime >= 0) ? ((i  * timeQuantum) - processes[i].arrivalTime) : 0;
 
-      // Process has yet to arrive...
+      // Process has yet to arrive... skip
       if (processes[i].arrivalTime > result.totalTime){
         allProcessesDoneFlag = 0;
         continue;
