@@ -9,25 +9,11 @@
 #include "../Models/process_result.h"
 #include "../Models/round_robin_result.h"
 #include "../Util/color_print.h"
+#include "../Models/ready_process.h"
+
 
 #include "EFPRR.h"
 #include "round_robin.h"
-
-// Used to sort processes in the ready queue by burst time.
-int compare_ready_processes(const void *a, const void *b)
-{
-    ReadyProcess *p1 = (ReadyProcess *)a;
-    ReadyProcess *p2 = (ReadyProcess *)b;
-
-    return p1->burstTime - p2->burstTime;
-}
-
-
-// https://stackoverflow.com/questions/5989191/compare-two-floats
-// Because floats are not precise.
-int areEqual(float a, float b, float epsilon) {
-    return fabs(a - b) < epsilon;
-}
 
 RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
 {
@@ -75,7 +61,6 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
     float currentTimeQuantum = 0.0f;
     result.timeQuantumUsed = 0;
     while (1) {
-        int processExecutedFlag = 0;
         for (i = 0; i < readyQueueSize; i++) {
 
             // Calculate time quantum by (Average Burst Time / Number of processes) * 0.85f;
@@ -91,7 +76,7 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
             newTimeQuantum *= 0.85f;
 
             // Time quantum changed, record it down.
-            if (areEqual(currentTimeQuantum, newTimeQuantum, 0.0001) == 0){
+            if (areEqual(currentTimeQuantum, newTimeQuantum, 0.0001f) == 0){
                 result.timeQuantums[result.timeQuantumUsed] = newTimeQuantum;
                 result.timeQuantumUsed += 1;
 
@@ -110,8 +95,6 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
                         }
                     }
                 }
-
-                processExecutedFlag = 1;
 
                 // The remaining time left on process is more than the timeQuantum given...
                 if (readyQueue[i].remainingTime > currentTimeQuantum) {

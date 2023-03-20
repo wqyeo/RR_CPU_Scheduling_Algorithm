@@ -15,7 +15,7 @@ SRCS=$(SRC_DIR)/main.c $(SRC_DIR)/console_application.c $(SRC_DIR)/process_gener
 OBJS=$(SRCS:.c=.o)
 
 # Header files
-HDRS=$(SRC_DIR)/console_application.h $(SRC_DIR)/process_generator.h $(UTIL_DIR)/data_saver.h $(UTIL_DIR)/color_print.h $(RR_DIR)/best_quantum_time_round_robin.h $(RR_DIR)/manhattan_round_robin.h $(RR_DIR)/EFPRR.h $(RR_DIR)/round_robin.h $(MODELS_DIR)/process.h $(MODELS_DIR)/process_result.h $(MODELS_DIR)/round_robin_result.h
+HDRS=$(SRC_DIR)/console_application.h $(SRC_DIR)/process_generator.h $(UTIL_DIR)/data_saver.h $(UTIL_DIR)/color_print.h $(RR_DIR)/best_quantum_time_round_robin.h $(RR_DIR)/manhattan_round_robin.h $(RR_DIR)/EFPRR.h $(RR_DIR)/round_robin.h $(MODELS_DIR)/process.h $(MODELS_DIR)/process_result.h $(MODELS_DIR)/round_robin_result.h $(MODELS_DIR)/ready_process.h
 
 # Output executable name
 OUTPUT=program
