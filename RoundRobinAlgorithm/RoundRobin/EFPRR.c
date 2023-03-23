@@ -20,6 +20,9 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
     RoundRobinResult result;
     int i, j;
 
+    // Sort process in order of ascending burst time.
+    qsort(processes, processesSize, sizeof(Process), compare_processes);
+
     // This array will be used to keep track of what processes we have added into the ready queue before,
     // which hasn't been added yet.
     int addedProcessFlag[processesSize];
@@ -53,8 +56,6 @@ RoundRobinResult EFPRR(Process *processes, int processesSize, char* grouping)
             addedProcessFlag[i] = 0;
         }
     }
-
-    qsort(readyQueue, readyQueueSize, sizeof(ReadyProcess), compare_ready_processes);
 
     char lastProcess[MAX_NAME_LEN] = "";
 

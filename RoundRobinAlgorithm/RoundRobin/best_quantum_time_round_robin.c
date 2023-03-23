@@ -31,6 +31,7 @@ float median_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
         }
     }
 
+/*
     for (int i=0; i < undoneProcessesSize-1; i++)
     {
         for (int j=i+1; j<undoneProcessesSize; j++)
@@ -43,6 +44,7 @@ float median_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
             }
         }
     }
+*/
 
     int median;
     if (undoneProcessesSize % 2 == 0)
@@ -73,7 +75,7 @@ float mean_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
     }
 
     // Return mean
-    return (sum / count);
+    return (sum / (float) count);
 }
 
 float find_best_time_quantum(ReadyProcess* readyQueue, int readyQueueSize){
@@ -86,6 +88,9 @@ float find_best_time_quantum(ReadyProcess* readyQueue, int readyQueueSize){
 RoundRobinResult modified_round_robin(Process *processes, int processesSize, char* grouping) {
 RoundRobinResult result;
     int i, j;
+
+    // Sort process in order of ascending burst time.
+    qsort(processes, processesSize, sizeof(Process), compare_processes);
 
     // This array will be used to keep track of what processes we have added into the ready queue before,
     // which hasn't been added yet.
@@ -127,7 +132,6 @@ RoundRobinResult result;
 
     char lastProcess[MAX_NAME_LEN] = "";
 
-    qsort(readyQueue, readyQueueSize, sizeof(ReadyProcess), compare_ready_processes);
     float currentTimeQuantum = find_best_time_quantum(readyQueue, readyQueueSize);
     result.timeQuantums[0] = currentTimeQuantum;
     result.timeQuantumUsed = 1;
