@@ -1,9 +1,9 @@
 #ifndef PROCESS_GENERATOR_H
 #define PROCESS_GENERATOR_H
 
-#define MAX_BURST_TIME 54
+#define MAX_BURST_TIME 40
 #define MIN_BURST_TIME 1
-#define MAX_ARRIVAL_TIME 20
+#define MAX_ARRIVAL_TIME 15
 
 #include "Models/process.h"
 

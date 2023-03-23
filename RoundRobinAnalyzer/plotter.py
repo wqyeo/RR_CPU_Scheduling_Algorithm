@@ -1,9 +1,16 @@
 import matplotlib.pyplot as plt
-
+import numpy as np
 from models.analysis_group import AnalysisGroup
 from models.round_robin_type import RoundRobinType
 from models.analysis_data import AnalysisData
 from models.line_plot import LinePlot
+from scipy.interpolate import make_interp_spline
+from enum import Enum
+class GraphType(Enum):
+    CONTEXT_SWITCH = 0,
+    WAITING_TIME = 1,
+    TURNAROUND_TIME = 2,
+    RESPONSE_TIME = 3
 
 def get_plot_color_by_rr_type(rr_type: RoundRobinType) -> str:
     if rr_type == RoundRobinType.BEST_QUANTUM_TIME:
@@ -20,16 +27,16 @@ def get_plot_color_by_rr_type(rr_type: RoundRobinType) -> str:
 
 def get_legend_name_by_rr_type(rr_type: RoundRobinType) -> str:
     if rr_type == RoundRobinType.BEST_QUANTUM_TIME:
-        return "Best Quantum Time"
+        return "Best Time Quantum"
     if rr_type == RoundRobinType.MANHATTAN:
         return "Manhattan Distance"
     if rr_type == RoundRobinType.SORTED:
         return "Sorted"
     if rr_type == RoundRobinType.EIGHTY_FIVE_PERCENT:
-        return "Eighty Five Percent"
-    return "Standard Round Robin"
+        return "Yosef"
+    return "Traditional Round Robin"
 
-def plot_graph_analysis(analysis_groupings: dict[str, AnalysisGroup], graph_file_name: str) -> None:
+def plot_graph_analysis(analysis_groupings: dict[str, AnalysisGroup], graph_file_name: str, graph_name: str, graph_type: GraphType ) -> None:
     colored_line_plots : dict[str, LinePlot] = {}
 
     curr_x = 0
@@ -43,11 +50,16 @@ def plot_graph_analysis(analysis_groupings: dict[str, AnalysisGroup], graph_file
                 legend = get_legend_name_by_rr_type(analysis_data.rr_type)
                 data_line_plot = LinePlot(data_color, legend)
                 colored_line_plots[data_color] = data_line_plot
-            data_line_plot.add_plot(curr_x, round(analysis_data.context_switch_count))
-        curr_x += 1
+            x = round(analysis_data.total_time_taken)
+            if graph_type == GraphType.CONTEXT_SWITCH:
+                data_line_plot.add_plot(x, round(analysis_data.context_switch_count))
+            elif graph_type == GraphType.WAITING_TIME:
+                data_line_plot.add_plot(x, round(analysis_data.average_waiting_time))
+            elif graph_type == GraphType.RESPONSE_TIME:
+                data_line_plot.add_plot(x, round(analysis_data.average_response_time))
+            elif graph_type == GraphType.TURNAROUND_TIME:
+                data_line_plot.add_plot(x, round(analysis_data.average_turnaround_time))
   
-    # TODO: Caller should pass in a configuration for plotting. 
-    # Able to set title, size and what to plot.
     plt.figure(figsize=(10, 6))
     legends: list[str] = []
 
@@ -57,9 +69,6 @@ def plot_graph_analysis(analysis_groupings: dict[str, AnalysisGroup], graph_file
 
     legend_location = "upper right"
     plt.legend(legends, loc=legend_location)
-    # NOTE: Remove the X-ticks as they show nothing useful.
-    # Though we can change it up such that it can show something like: "Turnaround time (y) over number of processes (x)"
-    plt.xticks([])
 
-    plt.title("Context Switch Count")
+    plt.title(graph_name)
     plt.savefig(graph_file_name)

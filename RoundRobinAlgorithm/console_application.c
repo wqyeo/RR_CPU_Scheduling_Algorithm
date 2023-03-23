@@ -19,20 +19,31 @@
 #include "Util/color_print.h"
 #include "Util/data_saver.h"
 
+#define TEST_CASE_GENERATION_COUNT 250
 #define MAX_DATETIME_LEN 32
 #define DEFAULT_TIME_QUANTUM 5
 
-char *generate_random_string(int length)
+// NOTE: With C's linear random, the generator will eventually loop back around to use the same number.
+// Using the below two variables solves the problem, though there is a chance for it to loop back around again.
+
+// To solve pseudo-random number generation problem; This variable will be added to the generated number
+// and counted.
+int generatedTestCasesCount;
+int generatedCharactersCount;
+char *generate_random_string()
 {
+    int length = (rand() + generatedTestCasesCount)  % (MAX_NAME_LEN- 4) + 2;
     static char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     char *random_string = malloc(sizeof(char) * (length + 1));
 
     for (int i = 0; i < length; i++)
     {
-        int index = rand() % (int)(sizeof(charset) - 1);
+        int index = (rand() + generatedCharactersCount)  % ((int)(sizeof(charset) - 1));
         random_string[i] = charset[index];
+        ++generatedCharactersCount;
     }
 
+    ++generatedTestCasesCount;
     random_string[length] = '\0';
 
     return random_string;
@@ -329,7 +340,7 @@ void run_round_robin_tests(RunMode runMode, int processCount, char* fileNameExte
     }
 
     char fileName[54] = "";
-    char* groupingString = generate_random_string(62);
+    char* groupingString = generate_random_string();
 
     for (size_t i = 0; i < roundRobinsToUse.size; ++i)
     {
@@ -426,6 +437,9 @@ void repeat_do_test(int repeatCount)
 void run_application()
 {
     srand(time(NULL));
+    generatedTestCasesCount = 0;
+    generatedCharactersCount = 0;
+
     PRINT_WHITE("Round Robin Simulator...\n");
     char inputStr[MAX_USER_INPUT_SIZE];
 
@@ -459,7 +473,7 @@ void run_application()
         else if (strcmp(inputStr, "3") == 0 || strcmp(inputStr, "generate") == 0)
         {
             // NOTE: Probably can generate this test case count as well.
-            repeat_do_test(30);
+            repeat_do_test(TEST_CASE_GENERATION_COUNT);
         }
         else if (strcmp(inputStr, "exit") == 0)
         {

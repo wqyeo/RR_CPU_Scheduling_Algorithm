@@ -19,9 +19,9 @@ def is_whitespace_or_none_or_validation(input_str: str) -> bool:
         return False
 
 def determine_rr_type_from_str(rr_type_str: str) -> RoundRobinType:
-    if rr_type_str == "Best Quantum Time Round Robin":
+    if rr_type_str == "Best Time Quantum Round Robin":
         return RoundRobinType.BEST_QUANTUM_TIME
-    elif rr_type_str == "Round Robin Manhattan Distance":
+    elif rr_type_str == "Manhattan Round Robin":
         return RoundRobinType.MANHATTAN
     elif rr_type_str == "Eighty Five Percentile Round Robin":
         return RoundRobinType.EIGHTY_FIVE_PERCENT
@@ -93,7 +93,7 @@ def read_from_file(file_path: str) -> AnalysisData:
                 # Reading details from the Round robin result
                 update_main_data_with_line(line, analysis_data, index_counter)
                 index_counter += 1
-                if (index_counter == 9):
+                if (index_counter == 8):
                     # End of section
                     curr_read_mode = _ReadMode.READING_PROCESS
                     index_counter = 0
