@@ -7,7 +7,7 @@ This project is done as part of a University Module.
 
 This project aims to conduct analysis on study on the various Round Robin scheduling algorithms, these algorithms include:
 
-- Round Robin
+- Traditional Round Robin
 - [Optimal Round Robin CPU Scheduling Algorithm using Manhattan Distance](https://www.researchgate.net/publication/320855939_Optimal_Round_Robin_CPU_Scheduling_Algorithm_Using_Manhattan_Distance)
 - [Best Time Quantum Round Robin CPU Scheduling Algorithm](https://ijseas.com/volume3/v3i5/ijseas20170529.pdf)
 - [Yosef Round Robin](https://ieeexplore.ieee.org/document/8716476)
