@@ -31,7 +31,7 @@ float median_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
         }
     }
 
-/*
+    // Sort by increasing remaining time.
     for (int i=0; i < undoneProcessesSize-1; i++)
     {
         for (int j=i+1; j<undoneProcessesSize; j++)
@@ -44,7 +44,6 @@ float median_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
             }
         }
     }
-*/
 
     int median;
     if (undoneProcessesSize % 2 == 0)
@@ -59,6 +58,9 @@ float median_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
     return median;
 }
 
+/**
+* Find the mean of all processes in the ready queue.
+*/
 float mean_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
 {
     float sum = 0;
@@ -78,15 +80,21 @@ float mean_ready_queue(ReadyProcess* readyQueue, int readyQueueSize)
     return (sum / (float) count);
 }
 
-float find_best_time_quantum(ReadyProcess* readyQueue, int readyQueueSize){
-   float mean = mean_ready_queue(readyQueue, readyQueueSize);
-  float median = median_ready_queue(readyQueue, readyQueueSize);
+/**
+* Find the time quantum for this round robin;
+* Just make calls to find mean/median and divides by 2
+*/
+float find_best_time_quantum(ReadyProcess* readyQueue, int readyQueueSize)
+{
+    float mean = mean_ready_queue(readyQueue, readyQueueSize);
+    float median = median_ready_queue(readyQueue, readyQueueSize);
 
-  return (mean + median) / 2.0f;
+    return (mean + median) / 2.0f;
 }
 
-RoundRobinResult modified_round_robin(Process *processes, int processesSize, char* grouping) {
-RoundRobinResult result;
+RoundRobinResult modified_round_robin(Process *processes, int processesSize, char* grouping)
+{
+    RoundRobinResult result;
     int i, j;
 
     // Sort process in order of ascending burst time.
@@ -228,10 +236,12 @@ RoundRobinResult result;
         }
 
         timeSkipOccuredFlag = 0;
-        if (processHadArrivedFlag == 1){
+        if (processHadArrivedFlag == 1)
+        {
             float newTimeQuantum = find_best_time_quantum(readyQueue, readyQueueSize);
             // If this is a new time quantum, record it.
-            if (areEqual(newTimeQuantum, currentTimeQuantum, 0.0001f) == 0){
+            if (areEqual(newTimeQuantum, currentTimeQuantum, 0.0001f) == 0)
+            {
                 currentTimeQuantum = newTimeQuantum;
                 result.timeQuantums[result.timeQuantumUsed] = newTimeQuantum;
                 result.timeQuantumUsed += 1;
@@ -242,7 +252,8 @@ RoundRobinResult result;
 
         // Check if processes are done or added.
         int allProcessesDone = ready_queue_done(readyQueue, readyQueueSize);
-        if (all_processes_added(addedProcessFlag, allProcessesDone) == 0){
+        if (all_processes_added(addedProcessFlag, allProcessesDone) == 0)
+        {
             allProcessesDone = 0;
         }
 

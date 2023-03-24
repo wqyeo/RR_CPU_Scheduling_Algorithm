@@ -66,9 +66,11 @@ RoundRobinResult result;
     // which hasn't been added yet.
     int addedProcessFlag[processesSize];
 
+    // Setup ready queue
     int readyQueueSize = 0;
     ReadyProcess* readyQueue = (ReadyProcess*) malloc(sizeof(ReadyProcess) * processesSize);
 
+    // Init results
     strcpy(result.grouping, grouping);
     result.processesSize = processesSize;
     result.processResults = (ProcessResult*) malloc(sizeof(ProcessResult) * processesSize);
@@ -257,6 +259,8 @@ RoundRobinResult result;
             break;
         }
     }
+
+    // END; Calculate average
 
     result.avgWaitingTime = 0.0f;
     result.avgTurnaroundTime = 0.0f;
